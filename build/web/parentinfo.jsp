@@ -79,7 +79,7 @@
                                         <c:forEach items="${listP}" var="p">
                                             <tr>
                                                 <td class="text_page" style="font-weight: 500">${p.name}</td>
-                                                <td class="text_page" style="font-weight: 500"><img style="width: 70px; height: 70px" src="${p.img}"></td>
+                                                <td class="text_page" style="font-weight: 500"><img style="width: 70px; height: 70px" src="${p.img}" alt="Avatar"></td>
                                                 <td class="text_page" style="font-weight: 500">${p.email}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.phone}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.gender}</td>
