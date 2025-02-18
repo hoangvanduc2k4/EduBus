@@ -2108,8 +2108,11 @@
             <div class="w3-bar w3-card" style="background-color: #ffe082; display: flex; height: 70px; align-items: center;">
 
                 <div style="display: flex; justify-content: center; align-items: center; margin-left: 300px;">
-                    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu">
-                        <i class="fa fa-bars"></i>
+                    <button class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" 
+                        onclick="myFunction()" 
+                        title="Toggle Navigation Menu">
+                    </button>
+                    <i class="fa fa-bars"></i>
                     </a>
                     <a href="home.jsp" class="w3-bar-item w3-button w3-padding-large" style="text-decoration: none"><i class="fas fa-home"></i> Home</a>
                     <c:if test="${not empty sessionScope.account}">
