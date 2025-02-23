@@ -12,7 +12,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
         <style>
             html {
                 box-sizing: border-box
@@ -2165,7 +2164,6 @@
                         </button>
                     </div>
 
-
                     <div class="slide" style="display: flex; justify-content: center; align-items: center; transition: transform 0.5s ease-in-out;">
                         <img src="./image/slide1.png" alt="Bus2School Slide 1" style="width: 100%; border-radius: 10px;">
                     </div>
@@ -2203,11 +2201,7 @@
                             <i class="fas fa-bell"></i>
                         </button>
                     </div>
-
                 </div>
-
-
-
                 <!-- Stats Section -->
                 <!-- Thêm liên kết đến Font Awesome -->
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -2232,7 +2226,6 @@
                         <p style="color: #3e2723; margin: 10px 0; font-size: 14px;">Nhà xe đăng ký sử dụng Bus2School để hỗ trợ việc đưa đón học sinh đi học.</p>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -2247,7 +2240,6 @@
                  style="width: 100%; max-width: 1800px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease-in-out; filter: grayscale(50%);"
                  alt="School Bus Application">
         </a>
-
 
         <%@include file="footer.jsp" %>
 
@@ -2266,6 +2258,5 @@
             showSlide(currentSlide);
             setInterval(nextSlide, 2000);
         </script>
-
     </body>
 </html>

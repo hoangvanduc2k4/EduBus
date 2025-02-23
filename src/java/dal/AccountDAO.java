@@ -182,6 +182,27 @@ public class AccountDAO extends DBContext {
         }
     }
 
+    public Account getAccountByUsername(String username) {
+        String sql = "SELECT * FROM Account WHERE Username = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("AccountID"),
+                            rs.getString("Username"),
+                            rs.getString("Password"),
+                            rs.getString("Role"),
+                            rs.getString("Status")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return null; // Không tìm thấy tài khoản
+    }
+
     public static void main(String[] args) {
         AccountDAO a = new AccountDAO();
         Account acc = new Account(0, "aaa", "123", "Parent", "Inactive");

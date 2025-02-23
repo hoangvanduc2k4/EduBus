@@ -1,12 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.AccountDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
@@ -15,63 +11,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 
-/**
- *
- * @author DIEN MAY XANH
- */
 public class LoginServlet extends HttpServlet {
 
-    AccountDAO d = new AccountDAO();
+    private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]+$";
+    private final AccountDAO d = new AccountDAO();
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -79,10 +29,18 @@ public class LoginServlet extends HttpServlet {
         String user = request.getParameter("user");
         String pass = request.getParameter("pass");
         String rem = request.getParameter("re");
+
+        // Validate username format
+        if (user == null || !Pattern.matches(USERNAME_PATTERN, user)) {
+            request.setAttribute("error1", "Invalid username! Only letters and numbers are allowed, no special characters or spaces.");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+
         Cookie u = new Cookie("cu", user);
         Cookie p = new Cookie("cp", pass);
         Cookie r = new Cookie("cr", rem);
-        
+
         if (rem != null) {
             u.setMaxAge(60 * 60 * 24);
             p.setMaxAge(60 * 60 * 24);
@@ -95,11 +53,13 @@ public class LoginServlet extends HttpServlet {
         response.addCookie(r);
         response.addCookie(u);
         response.addCookie(p);
-        Account a = d.checkAcc(user, pass);
+
+        Account userCheck = d.getAccountByUsername(user); // Check if username exists
+        Account a = d.checkAcc(user, pass); // Check username + password combination
 
         if (a != null) {
             if (a.getSt().equals("Inactive")) {
-                request.setAttribute("error1", "This account is not active.");
+                request.setAttribute("error1", "This account is not activated.");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             } else {
                 session.setAttribute("account", a);
@@ -110,20 +70,14 @@ public class LoginServlet extends HttpServlet {
                 }
             }
         } else {
-            request.setAttribute("error1", "Username or Password is incorrect!");
+            if (userCheck == null) {
+                request.setAttribute("error1", "Incorrect User Name");
+            } else if (!userCheck.getPassword().equals(pass)) {
+                request.setAttribute("error1", "Incorrect password.");
+            } else {
+                request.setAttribute("error1", "Username and password do not correct.");
+            }
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
-
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }
