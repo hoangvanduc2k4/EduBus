@@ -18,6 +18,7 @@ import java.util.Date;
 import model.Account;
 import model.Drivers;
 import model.Manager;
+import util.Validation;
 
 /**
  *
@@ -26,32 +27,6 @@ import model.Manager;
 public class ProfileServlet extends HttpServlet {
 
     SchoolDAO sd = new SchoolDAO();
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProfileServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProfileServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -80,19 +55,23 @@ public class ProfileServlet extends HttpServlet {
 
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account s = (Account) session.getAttribute("account");
+        if (s.getRole().equals("Driver")) {
+            Drivers o = sd.getDriver(s.getAccountid() + "");
+            request.setAttribute("o", o);
+        } else if (s.getRole().equals("Manager")) {
+            Manager o = sd.getManager(s.getAccountid() + "");
+            request.setAttribute("o", o);
+        }
+
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            // Lấy tham số từ request
             String name = request.getParameter("name");
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
@@ -101,28 +80,50 @@ public class ProfileServlet extends HttpServlet {
             String role = request.getParameter("role");
             int accid = Integer.parseInt(request.getParameter("accid"));
 
-            // Chuyển đổi từ String sang java.util.Date
+            // Validate tên (username) và ngày sinh
+            String errorName = Validation.validateUsername(name);
+            String errorDob = Validation.validateDob(dob);
+
+            // Nếu có lỗi từ validateName hoặc validateDob, đẩy attribute lỗi tương ứng
+            if (errorName != null || errorDob != null) {
+                if (errorName != null) {
+                    request.setAttribute("errorName", errorName);
+                }
+                if (errorDob != null) {
+                    request.setAttribute("errorDob", errorDob);
+                }
+                request.getRequestDispatcher("profile.jsp").forward(request, response);
+                return;
+            }
+
+            // Chuyển đổi ngày từ String sang java.util.Date và java.sql.Date
             java.util.Date utilDate = sdf.parse(dob);
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+            // Nếu img rỗng, gán giá trị mặc định
             if (img.isBlank()) {
                 img = "image/default.jpg";
             }
-            // Chuyển đổi sang java.sql.Date
-            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+            // Xử lý cập nhật theo vai trò (Driver hoặc Manager)
             if (role.equals("Driver")) {
                 Drivers o = new Drivers(0, name, phone, gender, sqlDate, img, accid);
                 sd.updateDriver(o);
                 request.setAttribute("o", o);
-
             } else {
                 Manager o = new Manager(0, name, phone, gender, sqlDate, img, accid);
                 sd.updateManager(o);
                 request.setAttribute("o", o);
-
             }
-        } catch (ParseException ex) {
-        }
-        response.sendRedirect("profile");
 
+            // Nếu cập nhật thành công, đẩy attribute success
+            request.setAttribute("success", "Cập nhật thành công.");
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
+
+        } catch (ParseException ex) {
+            request.setAttribute("error", "Lỗi xử lý ngày sinh.");
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
+        }
     }
 
     /**

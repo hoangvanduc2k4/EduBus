@@ -125,6 +125,11 @@
                                 <button type="button" class="btn btn-primary" onclick="toggleEdit()">Edit Profile</button>
                                 <button type="submit" class="btn btn-success" style="display:none;" id="saveButton">Save</button>
                             </form>
+                            <p style="text-align: center; color: red;">${errorDob}</p>
+                            <p style="text-align: center; color: red;">${errorName}</p>
+
+                            <p style="text-align: center; color: greenyellow;">${success}</p>
+
                         </div>
                     </div>
                 </div>
