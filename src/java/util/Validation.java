@@ -109,9 +109,6 @@ public class Validation {
         }
         // Kiểm tra độ dài tên người dùng (trước @) và tên miền (sau @)
         String[] parts = email.split("@");
-        if (parts[0].length() > 64 || parts[1].length() > 255) {
-            return false;
-        }
-        return true;
+        return !(parts[0].length() > 64 || parts[1].length() > 255);
     }
 }
