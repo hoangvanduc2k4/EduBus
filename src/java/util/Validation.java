@@ -7,6 +7,7 @@ package util;
 import java.text.ParseException;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -75,4 +76,46 @@ public class Validation {
         return null;
     }
 
+    public boolean isValidPhone(String phone) {
+        // Kiểm tra xem phone có rỗng hoặc null không
+        if (phone == null || phone.isBlank()) {
+            return false;
+        }
+        // Kiểm tra xem phone có đúng 10 số không
+        if (phone.length() != 10) {
+            return false;
+        }
+        // Kiểm tra phone có bắt đầu bằng số 0 không
+        if (!phone.startsWith("0")) {
+            return false;
+        }
+        // Kiểm tra phone chỉ chứa số, không có ký tự đặc biệt hoặc chữ cái
+        if (!phone.matches("\\d{10}")) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isValidEmail(String email) {
+        // Kiểm tra có chứa dấu cách không
+        if (email.contains(" ")) {
+            return false;
+        }
+        // Kiểm tra độ dài tối đa
+        if (email.length() > 320) {
+            return false;
+        }
+        // Biểu thức chính quy nâng cấp để kiểm tra email hợp lệ
+        String emailRegex = "^(?!.*\\.\\.)([A-Za-z0-9._%+-]{1,64})@([A-Za-z0-9.-]+)\\.([A-Za-z]{2,})$";
+        // Kiểm tra bằng regex
+        if (!Pattern.matches(emailRegex, email)) {
+            return false;
+        }
+        // Kiểm tra độ dài tên người dùng (trước @) và tên miền (sau @)
+        String[] parts = email.split("@");
+        if (parts[0].length() > 64 || parts[1].length() > 255) {
+            return false;
+        }
+        return true;
+    }
 }
