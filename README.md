@@ -4,7 +4,7 @@
 
 ## **Introduction**  
 Welcome to our School Bus Management System! This system is designed to provide an efficient solution for tracking, managing, and operating school transportation services. It enables easy registration of bus routes, driver management, and real-time monitoring to ensure accuracy and convenience.  
-
+![Image](https://github.com/user-attachments/assets/d0f8c07c-4448-4425-9736-028fed027d4f)
 ## **Key Features**  
 - Manage bus routes and schedules  
 - Track buses in real time  
