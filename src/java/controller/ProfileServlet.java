@@ -72,21 +72,25 @@ public class ProfileServlet extends HttpServlet {
                 }
                 // Gửi lại dữ liệu đã nhập theo đúng vai trò
                 if ("Driver".equals(role)) {
-                    request.setAttribute("o", new Drivers(0, name, phone, gender, new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
+                    request.setAttribute("o", new Drivers(0, name, phone, gender,
+                        new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
                 } else if ("Manager".equals(role)) {
-                    request.setAttribute("o", new Manager(0, name, phone, gender, new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
+                    request.setAttribute("o", new Manager(0, name, phone, gender,
+                        new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
                 }
                 request.getRequestDispatcher("profile.jsp").forward(request, response);
                 return;
             }
 
             // Kiểm tra số điện thoại hợp lệ
-            if (!isValidPhone(phone)) {
-                request.setAttribute("error", "Số điện thoại không hợp lệ! Vui lòng nhập lại.");
+            if (!Validation.isValidPhone(phone)) {
+                request.setAttribute("errorPhone", "Số điện thoại không hợp lệ! Vui lòng nhập lại.");
                 if ("Driver".equals(role)) {
-                    request.setAttribute("o", new Drivers(0, name, phone, gender, new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
+                    request.setAttribute("o", new Drivers(0, name, phone, gender,
+                        new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
                 } else if ("Manager".equals(role)) {
-                    request.setAttribute("o", new Manager(0, name, phone, gender, new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
+                    request.setAttribute("o", new Manager(0, name, phone, gender,
+                        new java.sql.Date(sdf.parse(dob).getTime()), img, accid));
                 }
                 request.getRequestDispatcher("profile.jsp").forward(request, response);
                 return;
@@ -120,25 +124,4 @@ public class ProfileServlet extends HttpServlet {
             request.getRequestDispatcher("profile.jsp").forward(request, response);
         }
     }
-
-    private boolean isValidPhone(String phone) {
-        // Kiểm tra xem phone có rỗng hoặc null không
-        if (phone == null || phone.isBlank()) {
-            return false;
-        }
-        // Kiểm tra xem phone có đúng 10 số không
-        if (phone.length() != 10) {
-            return false;
-        }
-        // Kiểm tra phone có bắt đầu bằng số 0 không
-        if (!phone.startsWith("0")) {
-            return false;
-        }
-        // Kiểm tra phone chỉ chứa số, không có ký tự đặc biệt hoặc chữ cái
-        if (!phone.matches("\\d{10}")) {
-            return false;
-        }
-        return true;
-    }
-
 }

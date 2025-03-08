@@ -1,5 +1,4 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,70 +9,59 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body {
-                background: linear-gradient(135deg, #ffedbc 0%, #f8d3a0 100%); /* Nền vàng cam pastel */
-                color: #4a4a4a; /* Màu chữ tối */
+                background: linear-gradient(135deg, #ffedbc 0%, #f8d3a0 100%);
+                color: #4a4a4a;
                 font-family: "Nunito", sans-serif;
-                transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền */
+                transition: background-color 0.3s ease;
             }
-
             .card {
                 border: none;
                 border-radius: 10px;
                 margin-top: 20px;
-                background-color: rgba(255, 255, 255, 0.9); /* Trắng sáng với độ trong suốt */
-                transition: transform 0.3s ease; /* Hiệu ứng phóng to khi di chuột */
+                background-color: rgba(255, 255, 255, 0.9);
+                transition: transform 0.3s ease;
             }
-
             .card:hover {
-                transform: translateY(-5px); /* Di chuyển lên khi hover */
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             }
-
             .card-header {
-                background-color: #ffcc80; /* Màu vàng cam nhạt cho tiêu đề */
+                background-color: #ffcc80;
                 font-weight: bold;
-                color: #3c3c3c; /* Màu chữ tối */
+                color: #3c3c3c;
             }
-
             .avatar img {
                 width: 150px;
                 border-radius: 50%;
-                border: 2px solid #ffab40; /* Viền cam */
-                transition: transform 0.3s ease; /* Hiệu ứng phóng to cho avatar */
+                border: 2px solid #ffab40;
+                transition: transform 0.3s ease;
             }
-
             .avatar img:hover {
-                transform: scale(1.1); /* Phóng to khi hover */
+                transform: scale(1.1);
             }
-
             .btn-primary {
-                background-color: #ffb300; /* Màu vàng cam */
+                background-color: #ffb300;
                 border: none;
-                transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+                transition: background-color 0.3s ease;
             }
-
             .btn-success {
-                background-color: #ffb300; /* Màu vàng */
+                background-color: #ffb300;
                 border: none;
-                transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+                transition: background-color 0.3s ease;
                 margin-top: 10px;
             }
-
             .btn-primary:hover {
-                background-color: #ffa000; /* Màu vàng cam đậm hơn khi hover */
+                background-color: #ffa000;
             }
-
             .btn-success:hover {
-                background-color: #ffca28; /* Màu vàng đậm hơn khi hover */
+                background-color: #ffca28;
             }
-
             .form-control {
-                transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền */
+                transition: background-color 0.3s ease;
             }
-
             .form-control:focus {
-                background-color: rgba(255, 255, 255, 1); /* Nền trắng khi focus */
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Đổ bóng khi focus */
+                background-color: rgba(255, 255, 255, 1);
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
             }
         </style>
     </head>
@@ -101,76 +89,67 @@
                                 ${error}
                             </div>
                         </c:if>
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name</label>
-                            <input class="form-control" id="fullName" name="name" type="text" value="${o.name}" readonly>
+                        <div class="card-header">YOUR PROFILE</div>
+                        <div class="card-body">
+                            <form method="post" action="profile">
+                                <input type="hidden" name="role" value="${account.role}" />
+                                <input type="hidden" name="accid" value="${o.accid}" />
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label">Full Name</label>
+                                    <input class="form-control" id="fullName" name="name" type="text" value="${o.name}" readonly>
+                                    <c:if test="${not empty errorName}">
+                                        <span class="text-danger">${errorName}</span>
+                                    </c:if>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input class="form-control" id="phone" name="phone" type="text" value="${o.phone}" readonly>
+                                    <c:if test="${not empty errorPhone}">
+                                        <span class="text-danger">${errorPhone}</span>
+                                    </c:if>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <input class="form-control" id="gender" name="gender" type="text" value="${o.gender}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dob" class="form-label">Date of Birth</label>
+                                    <input class="form-control" id="dob" name="dob" type="date" value="${o.dob}" readonly>
+                                    <c:if test="${not empty errorDob}">
+                                        <span class="text-danger">${errorDob}</span>
+                                    </c:if>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="img" class="form-label">Image Link</label>
+                                    <input class="form-control" id="img" name="img" type="text" value="${o.img}" readonly>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="toggleEdit()">Edit Profile</button>
+                                <button type="submit" class="btn btn-success" style="display:none;" id="saveButton">Save</button>
+                            </form>
+                            <c:if test="${not empty success}">
+                                <p style="text-align: center; color: greenyellow;">${success}</p>
+                            </c:if>
                         </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input class="form-control" id="phone" name="phone" readonly type="text" value="${o.phone}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <input class="form-control" id="gender" name="gender" type="text" value="${o.gender}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dob" class="form-label">Date of Birth</label>
-                            <input class="form-control" id="dob" name="dob" readonly type="date" value="${o.dob}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="img" class="form-label">Image Link</label>
-                            <input class="form-control" id="img" name="img" readonly type="text" value="${o.img}">
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="toggleEdit()">Edit Profile</button>
-                        <button type="submit" class="btn btn-success" style="display:none;" id="saveButton">Save</button>
-                        </form>
-                        <p style="text-align: center; color: red;">${errorDob}</p>
-                        <p style="text-align: center; color: red;">${errorName}</p>
-
-                        <p style="text-align: center; color: greenyellow;">${success}</p>
-
                     </div>
-                    <form method="post" action="profile" style="padding: 5px;">
-                        <input type="hidden" name="role" value="${account.role}" />
-                        <input type="hidden" name="accid" value="${o.accid}" />
-
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name</label>
-                            <input class="form-control" id="fullName" name="name" type="text" value="${param.name != null ? param.name : o.name}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input class="form-control" id="phone" name="phone" type="text" value="${param.phone != null ? param.phone : o.phone}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <input class="form-control" id="gender" name="gender" type="text" value="${param.gender != null ? param.gender : o.gender}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dob" class="form-label">Date of Birth</label>
-                            <input class="form-control" id="dob" name="dob" type="date" value="${param.dob != null ? param.dob : o.dob}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="img" class="form-label">Image Link</label>
-                            <input class="form-control" id="img" name="img" type="text" value="${param.img != null ? param.img : o.img}" readonly>
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="toggleEdit()">Edit Profile</button>
-                        <button type="submit" class="btn btn-success" style="display:none;" id="saveButton">Save</button>
-                    </form>
-                    >>>>>>> Stashed changes
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<script>
-    function toggleEdit() {
-        const inputs = document.querySelectorAll('.form-control');
-        inputs.forEach(input => {
-            input.readOnly = !input.readOnly;
-        });
-        document.getElementById('saveButton').style.display = 'block';
-    }
-</script>
-</body>
+        <script>
+            function toggleEdit() {
+                const inputs = document.querySelectorAll('.form-control');
+                inputs.forEach(input => {
+                    input.readOnly = !input.readOnly;
+                });
+                // Hiển thị nút Save khi chuyển sang chế độ edit
+                document.getElementById('saveButton').style.display = 'block';
+            }
+        </script>
+        <!-- Nếu có lỗi validate thì tự động chuyển sang trạng thái edit -->
+        <c:if test="${not empty errorName or not empty errorDob or not empty errorPhone}">
+            <script>
+                // Gọi hàm toggleEdit() để mở chế độ chỉnh sửa nếu có lỗi
+                toggleEdit();
+            </script>
+        </c:if>
+    </body>
 </html>
