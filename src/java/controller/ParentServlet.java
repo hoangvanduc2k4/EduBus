@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.ParentDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,52 +10,14 @@ import jakarta.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.regex.Pattern;
 import model.Account;
 import model.Parent;
 
-/**
- *
- * @author DIEN MAY XANH
- */
 public class ParentServlet extends HttpServlet {
 
     ParentDAO d = new ParentDAO();
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ParentServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ParentServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -71,84 +28,102 @@ public class ParentServlet extends HttpServlet {
         request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action") == null
-                ? ""
-                : request.getParameter("action");
-        String name = "", email = "", phone = "", gender = "", role = "", dob = "", img = "";
+        String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         HttpSession session = request.getSession();
         Account a = (Account) session.getAttribute("account");
-        java.util.Date utilDate;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<Parent> listP = d.getParentByAccId(a.getAccountid() + "");
+        request.setAttribute("listP", listP);
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String gender = request.getParameter("gender");
+        String dob = request.getParameter("dob");
+        String role = request.getParameter("role");
+        String img = request.getParameter("img");
 
-        switch (action) {
-            case "add":
-                name = request.getParameter("name");
-                email = request.getParameter("email");
-                phone = request.getParameter("phone");
-                gender = request.getParameter("gender");
-                dob = request.getParameter("dob");
-                role = request.getParameter("role");
-                img = request.getParameter("img");
-                if (img.isBlank()) {
-                    img = "image/default.jpg";
-                }
-                try {
-
-                    utilDate = sdf.parse(dob);
-                    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-                    Parent p = new Parent(0, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
-                    d.insert(p);
-                } catch (ParseException e) {
-                }
-
-                break;
-
-            case "update":
-                String idr = request.getParameter("id");
-                name = request.getParameter("name");
-                email = request.getParameter("email");
-                phone = request.getParameter("phone");
-                gender = request.getParameter("gender");
-                dob = request.getParameter("dob");
-                role = request.getParameter("role");
-                img = request.getParameter("img");
-                if (img.isBlank()) {
-                    img = "image/default.jpg";
-                }
-                try {
-                    int id = Integer.parseInt(idr);
-                    utilDate = sdf.parse(dob);
-                    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-                    Parent p = new Parent(id, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
-                    d.update(p);
-                } catch (ParseException e) {
-                }
-
-                break;
-
+        if (img == null || img.isBlank()) {
+            img = "image/default.jpg";
         }
+
+        try {
+            java.util.Date utilDate = sdf.parse(dob);
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+            if (action.equals("add")) {
+                // Kiểm tra email hợp lệ
+                if (!isValidEmail(email)) {
+                    request.setAttribute("errorAdd", "Email không hợp lệ!");
+                    // Giữ lại các giá trị đã nhập
+                    request.setAttribute("name", name);
+                    request.setAttribute("email", email);
+                    request.setAttribute("phone", phone);
+                    request.setAttribute("gender", gender);
+                    request.setAttribute("dob", dob);
+                    request.setAttribute("role", role);
+                    request.setAttribute("img", img);
+                    if (action.equals("update")) {
+                        request.setAttribute("id", request.getParameter("id"));
+                    }
+                    request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
+                    return;
+                }
+                Parent p = new Parent(0, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
+                d.insert(p);
+            } else if (action.equals("update")) {
+                // Kiểm tra email hợp lệ
+                if (!isValidEmail(email)) {
+                    request.setAttribute("errorUpdate", "Email không hợp lệ!");
+                    // Giữ lại các giá trị đã nhập
+                    request.setAttribute("name", name);
+                    request.setAttribute("email", email);
+                    request.setAttribute("phone", phone);
+                    request.setAttribute("gender", gender);
+                    request.setAttribute("dob", dob);
+                    request.setAttribute("role", role);
+                    request.setAttribute("img", img);
+                    if (action.equals("update")) {
+                        request.setAttribute("id", request.getParameter("id"));
+                    }
+                    request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
+                    return;
+                }
+                int id = Integer.parseInt(request.getParameter("id"));
+                Parent p = new Parent(id, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
+                d.update(p);
+            }
+        } catch (ParseException e) {
+            request.setAttribute("error", "Lỗi định dạng ngày tháng.");
+            request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
+            return;
+        }
+
         response.sendRedirect("parentinfo");
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+    private boolean isValidEmail(String email) {
+        // Kiểm tra có chứa dấu cách không
+        if (email.contains(" ")) {
+            return false;
+        }
+        // Kiểm tra độ dài tối đa
+        if (email.length() > 320) {
+            return false;
+        }
+        // Biểu thức chính quy nâng cấp để kiểm tra email hợp lệ
+        String emailRegex = "^(?!.*\\.\\.)([A-Za-z0-9._%+-]{1,64})@([A-Za-z0-9.-]+)\\.([A-Za-z]{2,})$";
+        // Kiểm tra bằng regex
+        if (!Pattern.matches(emailRegex, email)) {
+            return false;
+        }
+        // Kiểm tra độ dài tên người dùng (trước @) và tên miền (sau @)
+        String[] parts = email.split("@");
+        if (parts[0].length() > 64 || parts[1].length() > 255) {
+            return false;
+        }
+        return true;
+    }
 }

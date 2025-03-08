@@ -40,38 +40,34 @@
         <main>
             <div class="container pt-4" style="max-width: 1200px">
                 <section class="mb-4">
-                       <a href="changepass.jsp" class="btn btn-warning change-pass-btn">
-                                                    <i class="fa-solid fa-key"></i> Change Pass
-                                                </a>
+                    <a href="changepass.jsp" class="btn btn-warning change-pass-btn">
+                        <i class="fa-solid fa-key"></i> Change Pass
+                    </a>
                     <div class="card">
-                      
-                        <c:if test="${error != null}">
-                            <div style="margin-top: 20px" class="alert alert-danger" role="alert">${error}</div>
+
+                        <c:if test="${not empty errorUpdate}">
+                            <div style="margin-top: 20px" class="alert alert-danger" role="alert">${errorUpdate}</div>
                         </c:if>
-                        <c:if test="${mess != null}">
+                        <c:if test="${not empty mess}">
                             <div style="margin-top: 20px" class="alert alert-success" role="alert">${mess}</div>
                         </c:if>
 
                         <div class="card-body" style="padding: 0">
-
                             <div class="table-responsive">
-
                                 <table class="table table-hover text-nowrap" style="width: 100%;">
                                     <thead>
                                         <tr>
                                             <th class="text_page_head">Full Name</th>
                                             <th class="text_page_head">Avatar</th>
-                                            <th class="text_page_head">Email </th>
+                                            <th class="text_page_head">Email</th>
                                             <th class="text_page_head">Phone</th>
                                             <th class="text_page_head">Gender</th>
                                             <th class="text_page_head">Date of Birth</th>
                                             <th class="text_page_head">Role</th>
                                             <th>
-
                                                 <a style="margin-left: 5px" href="#addParentModal" class="btn btn-success" data-toggle="modal">
                                                     <i class="fa-solid fa-plus"></i>
                                                 </a>
-
                                             </th>
                                         </tr>
                                     </thead>
@@ -79,14 +75,15 @@
                                         <c:forEach items="${listP}" var="p">
                                             <tr>
                                                 <td class="text_page" style="font-weight: 500">${p.name}</td>
-                                                <td class="text_page" style="font-weight: 500"><img style="width: 70px; height: 70px" src="${p.img}" alt="Avatar"></td>
+                                                <td class="text_page" style="font-weight: 500">
+                                                    <img style="width: 70px; height: 70px" src="${p.img}" alt="Avatar">
+                                                </td>
                                                 <td class="text_page" style="font-weight: 500">${p.email}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.phone}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.gender}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.dob}</td>
                                                 <td class="text_page" style="font-weight: 500">${p.role}</td>
                                                 <td class="text_page" style="padding: 0 12px 16px">
-
                                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateParentModal" 
                                                             data-id="${p.pid}" 
                                                             data-name="${p.name}" 
@@ -115,6 +112,12 @@
                 <div class="modal-content">
                     <form id="form" action="parentinfo" method="post">
                         <input type="hidden" name="action" value="add" />
+
+                        <!-- Hiển thị lỗi Add nếu có -->
+                        <c:if test="${not empty errorAdd}">
+                            <div class="alert alert-danger">${errorAdd}</div>
+                        </c:if>
+
                         <div class="modal-header">
                             <h4 class="modal-title">Add Member</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -122,34 +125,42 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input name="name" type="text" class="form-control" required>
+                                <input name="name" type="text" class="form-control" required 
+                                       value="${not empty name ? name : ''}">
                             </div>
+
                             <div class="form-group">
                                 <label>Email</label>
-                                <input name="email" type="email" class="form-control" required>
+                                <input name="email" type="text" class="form-control" required 
+                                       value="${not empty email ? email : ''}">
                             </div>
+
                             <div class="form-group">
                                 <label>Phone:</label>
-                                <input name="phone" type="text" class="form-control" required>
+                                <input name="phone" type="text" class="form-control" required 
+                                       value="${not empty phone ? phone : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Gender</label>
                                 <select name="gender" class="form-control">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="Male" ${gender == 'Male' ? 'selected' : ''}>Male</option>
+                                    <option value="Female" ${gender == 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Date of birth:</label>
-                                <input name="dob" type="date" class="form-control" required>
+                                <input name="dob" type="date" class="form-control" required 
+                                       value="${not empty dob ? dob : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Role in Family:</label>
-                                <input name="role" type="text" class="form-control" required>
+                                <input name="role" type="text" class="form-control" required 
+                                       value="${not empty role ? role : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Image(URL):</label>
-                                <input id="updateImg" name="img" type="text" class="form-control">
+                                <input id="updateImg" name="img" type="text" class="form-control" 
+                                       value="${not empty img ? img : ''}">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -167,7 +178,13 @@
                 <div class="modal-content">
                     <form id="updateForm" action="parentinfo" method="post">
                         <input type="hidden" name="action" value="update" />
-                        <input type="hidden" name="id" id="updateId" />
+                        <input type="hidden" name="id" id="updateId" value="${not empty id ? id : ''}" />
+
+                        <!-- Hiển thị lỗi Update nếu có -->
+                        <c:if test="${not empty errorUpdate}">
+                            <div class="alert alert-danger">${errorUpdate}</div>
+                        </c:if>
+
                         <div class="modal-header">
                             <h4 class="modal-title">Update Member</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -175,34 +192,40 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input id="updateName" name="name" type="text" class="form-control" required>
+                                <input id="updateName" name="name" type="text" class="form-control" required 
+                                       value="${not empty name ? name : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input id="updateEmail" name="email" type="email" class="form-control" required>
+                                <input id="updateEmail" name="email" type="email" class="form-control" required 
+                                       value="${not empty email ? email : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Phone:</label>
-                                <input id="updatePhone" name="phone" type="text" class="form-control" required>
+                                <input id="updatePhone" name="phone" type="text" class="form-control" required 
+                                       value="${not empty phone ? phone : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Gender</label>
                                 <select id="updateGender" name="gender" class="form-control">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="Male" ${gender == 'Male' ? 'selected' : ''}>Male</option>
+                                    <option value="Female" ${gender == 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Date of birth:</label>
-                                <input id="updateDOB" name="dob" type="date" class="form-control" required>
+                                <input id="updateDOB" name="dob" type="date" class="form-control" required 
+                                       value="${not empty dob ? dob : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Role in Family:</label>
-                                <input id="updateRole" name="role" type="text" class="form-control" required>
+                                <input id="updateRole" name="role" type="text" class="form-control" required 
+                                       value="${not empty role ? role : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Image(URL):</label>
-                                <input id="updateImg" name="img" type="text" class="form-control">
+                                <input id="updateImg" name="img" type="text" class="form-control" 
+                                       value="${not empty img ? img : ''}">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -215,11 +238,27 @@
         </div>
 
         <jsp:include page="footer.jsp"/>
-        <script>
 
-            // Populate update form with existing data
+        <!-- Script tự động hiển thị modal nếu có lỗi -->
+        <script>
+            $(document).ready(function () {
+            <c:if test="${not empty errorAdd}">
+                $('#addParentModal').modal('show');
+            </c:if>
+            <c:if test="${not empty errorUpdate}">
+                $('#updateParentModal').modal('show');
+            </c:if>
+            });
+        </script>
+
+        <!-- Script để populate dữ liệu khi mở modal update (nếu không có lỗi, dùng data attributes từ button) -->
+        <script>
             $('#updateParentModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
+                var button = $(event.relatedTarget); // Button kích hoạt modal
+                // Nếu có lỗi update thì dữ liệu đã được set sẵn từ request nên không cần set lại từ data-attributes
+                if ($('<c:out value="${errorUpdate}" />').text().trim() !== '') {
+                    return;
+                }
                 var id = button.data('id');
                 var name = button.data('name');
                 var email = button.data('email');
@@ -227,9 +266,9 @@
                 var gender = button.data('gender');
                 var dob = button.data('dob');
                 var role = button.data('role');
-                var img = button.find('img').attr('src'); // Lấy URL hình ảnh
+                // Lấy URL hình ảnh nếu có (nếu không thì bỏ qua)
+                var img = button.find('img').attr('src') || '';
 
-                // Update the modal's content
                 var modal = $(this);
                 modal.find('#updateId').val(id);
                 modal.find('#updateName').val(name);
@@ -238,8 +277,7 @@
                 modal.find('#updateGender').val(gender);
                 modal.find('#updateDOB').val(dob);
                 modal.find('#updateRole').val(role);
-                modal.find('#updateImg').val(img); // Điền URL hình ảnh vào input
-
+                modal.find('#updateImg').val(img);
             });
         </script>
     </body>

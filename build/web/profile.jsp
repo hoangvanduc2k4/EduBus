@@ -96,12 +96,13 @@
                 </div>
                 <div class="col-xl-8">
                     <div class="card">
-                        <div class="card-header">YOUR PROFILE</div>
-                        <div class="card-body">
-                            <form method="post" action="profile">
-                                <input type="hidden" name="role" value="${account.role}" />
-                                <input type="hidden" name="accid" value="${o.accid}" />
+                        <c:if test="${not empty error}">
+                            <div class="alert alert-danger" role="alert">
+                                ${error}
+                            </div>
+                        </c:if>
 
+<<<<<<< Updated upstream
                                 <div class="mb-3">
                                     <label for="fullName" class="form-label">Full Name</label>
                                     <input class="form-control" id="fullName" name="name" type="text" value="${o.name}" readonly>
@@ -131,18 +132,48 @@
                             <p style="text-align: center; color: greenyellow;">${success}</p>
 
                         </div>
+=======
+                        <form method="post" action="profile" style="padding: 5px;">
+                            <input type="hidden" name="role" value="${account.role}" />
+                            <input type="hidden" name="accid" value="${o.accid}" />
+
+                            <div class="mb-3">
+                                <label for="fullName" class="form-label">Full Name</label>
+                                <input class="form-control" id="fullName" name="name" type="text" value="${param.name != null ? param.name : o.name}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input class="form-control" id="phone" name="phone" type="text" value="${param.phone != null ? param.phone : o.phone}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <input class="form-control" id="gender" name="gender" type="text" value="${param.gender != null ? param.gender : o.gender}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="dob" class="form-label">Date of Birth</label>
+                                <input class="form-control" id="dob" name="dob" type="date" value="${param.dob != null ? param.dob : o.dob}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="img" class="form-label">Image Link</label>
+                                <input class="form-control" id="img" name="img" type="text" value="${param.img != null ? param.img : o.img}" readonly>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="toggleEdit()">Edit Profile</button>
+                            <button type="submit" class="btn btn-success" style="display:none;" id="saveButton">Save</button>
+                        </form>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            function toggleEdit() {
-                const inputs = document.querySelectorAll('.form-control');
-                inputs.forEach(input => {
-                    input.readOnly = !input.readOnly;
-                });
-                document.getElementById('saveButton').style.display = 'block';
-            }
-        </script>
-    </body>
+    </div>
+    <script>
+        function toggleEdit() {
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.readOnly = !input.readOnly;
+            });
+            document.getElementById('saveButton').style.display = 'block';
+        }
+    </script>
+</body>
 </html>
