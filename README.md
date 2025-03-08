@@ -1,3 +1,4 @@
+<div align="center">
 # 🚍 Bus Route Registration & Student Tracking System
 
 ## 🌟 Technologies Used
@@ -66,7 +67,7 @@
    ```bash
    git clone https://github.com/hoangvanduc2k4/EduBus.git
    ```
-2. Import project into your IDE (Eclipse/IntelliJ)
+2. Import project into your IDE (Netbean/Eclipse/IntelliJ)
 3. Set up database using `BUS_MANAGEMENT` and `trigger.sql`
 4. Configure `DBContext.java` with your database credentials
 5. Deploy on Apache Tomcat Server
@@ -78,3 +79,4 @@
 ## 📧 Contact
 For any queries, feel free to contact **hoangduc060704@gmail.com**
 
+</div>
