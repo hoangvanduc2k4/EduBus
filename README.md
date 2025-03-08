@@ -11,11 +11,14 @@
 
 ## 👥 Team Members
 <div align="center">
+   
 | Name            | Role         |
 |----------------|-------------|
 | Hoàng Văn Đức  | Fullstack Dev |
 | Nguyễn Hoàng Sơn | Fullstack Dev |
+
 </div>
+
 ## 📌 Features
 - Bus route registration for students
 - Real-time student tracking
@@ -33,6 +36,7 @@
 <img src="https://github.com/user-attachments/assets/60c01739-a93b-4f79-bbb3-4e16576ed957" width="300">
 <img src="https://github.com/user-attachments/assets/306a2342-d82d-4c4e-8cdd-3a2986ddda97" width="300">
 </div>
+
 ### 🔴 Admin Screens
 <div align="center">
 <img src="https://github.com/user-attachments/assets/d375f001-f7f0-4b07-9252-2a0b2c2901a9" width="300">
@@ -45,6 +49,7 @@
 <img src="https://github.com/user-attachments/assets/fcbb0d9a-d359-405f-abe7-a4bf7ee2b702" width="300">
 <img src="https://github.com/user-attachments/assets/e018af1c-1161-4e53-8e38-45ccf0e16b6f" width="300">
 </div>
+
 ### 🟡 Manager Screens
 <div align="center">
 <img src="https://github.com/user-attachments/assets/70a3a440-b3f3-4065-a64e-be2549479939" width="300">
@@ -53,6 +58,7 @@
 <img src="https://github.com/user-attachments/assets/e210f2d3-7b33-4db7-9bdd-7c54e6eb5185" width="300">
 <img src="https://github.com/user-attachments/assets/4e7003c7-4e9f-4565-8ed0-46b62af63eb6" width="300">
 </div>
+
 ### 🟠 Parent Screens
 <div align="center">
 <img src="https://github.com/user-attachments/assets/94b8d40f-b95a-4d8a-8adc-9a09a7a09493" width="300">
@@ -64,10 +70,12 @@
 <img src="https://github.com/user-attachments/assets/068e3ad3-35ad-44bf-b619-067b4102f440" width="300">
 <img src="https://github.com/user-attachments/assets/ac41d781-d5a0-499f-a823-2a9a495aa13b" width="300">
 </div>
+
 ### 🔵 Driver Screens
 <div align="center">
 <img src="https://github.com/user-attachments/assets/73403630-525b-4374-b970-ef3b2898d7b1" width="300">
 </div>
+
 ## 🚀 How to Run the Project
 1. Clone this repository:
    ```bash
