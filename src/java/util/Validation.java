@@ -76,7 +76,7 @@ public class Validation {
         return null;
     }
 
-    public boolean isValidPhone(String phone) {
+    public static boolean isValidPhone(String phone) {
         // Kiểm tra xem phone có rỗng hoặc null không
         if (phone == null || phone.isBlank()) {
             return false;
@@ -96,7 +96,7 @@ public class Validation {
         return true;
     }
 
-    public boolean isValidEmail(String email) {
+    public static boolean isValidEmail(String email) {
         // Kiểm tra có chứa dấu cách không
         if (email.contains(" ")) {
             return false;

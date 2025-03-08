@@ -64,9 +64,9 @@ public class Email {
                     + "    <head>\n"
                     + "    </head>\n"
                     + "    <body>\n"
-                    + "        <p>User: "+name+"</p>\n"
-                    + "        <p>Gmail: "+email+"<p>\n"
-                    + "        <p>Nội dung:"+com+"</p>\n"
+                    + "        <p>User: " + name + "</p>\n"
+                    + "        <p>Gmail: " + email + "<p>\n"
+                    + "        <p>Nội dung:" + com + "</p>\n"
                     + "    </body>\n"
                     + "</html>\n"
                     + "";
@@ -84,5 +84,5 @@ public class Email {
             System.out.println("Fail");
         }
     }
-
 }
+
