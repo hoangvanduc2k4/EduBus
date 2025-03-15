@@ -111,4 +111,31 @@ public class Validation {
         String[] parts = email.split("@");
         return !(parts[0].length() > 64 || parts[1].length() > 255);
     }
+    
+        public boolean validatePassword(String str) {
+        //check length of string
+        if (str.length() < 6) {
+            return false;
+        }
+
+        boolean hasUpperCase = false;
+        boolean hasLowerCase = false;
+        boolean hasDigit = false;
+        boolean hasSpecialChar = false;
+
+        // Iterate through each character in the string
+        for (char c : str.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else {
+                hasSpecialChar = true;
+            }
+        }
+
+        return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+    }
 }

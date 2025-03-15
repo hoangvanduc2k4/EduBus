@@ -1,123 +1,106 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.AccountDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
 import model.Account;
 import model.User;
 
-/**
- *
- * @author DIEN MAY XANH
- */
 public class ManageAccountServlet extends HttpServlet {
 
     AccountDAO d = new AccountDAO();
 
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Thiết lập UTF-8 cho request và response
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+
         HttpSession session = request.getSession();
-        List<User> list = d.getAccount();
-        String id_raw = "";
-        String v = null;
-        String action = request.getParameter("action") == null
-                ? ""
-                : request.getParameter("action");
-        switch (action) {
 
-            case "search":
-                v = request.getParameter("valueSearch");
-                session.setAttribute("v", v);
-                List<User> listU = new ArrayList<>();
-                for (User u : list) {
-                    if (u.getName().toLowerCase().contains(v.toLowerCase())
-                            || u.getPhone().contains(v)
-                            || u.getRole().toLowerCase().contains(v.toLowerCase())
-                            || u.getStatus().toLowerCase().contains(v.toLowerCase())) {
-                        listU.add(u);
-                    }
-                }
-                request.setAttribute("listU", listU);
-                request.getRequestDispatcher("manageAccount.jsp").forward(request, response);
-
-                break;
-            case "add":
-                String u = request.getParameter("user");
-                String p = request.getParameter("pass");
-                String r = request.getParameter("role");
-                Account a = new Account(0, u, p, r, "Active");
-                d.insertAccount(a);
-                if (session.getAttribute("v") != null) {
-                    v = (String) session.getAttribute("v");
-                } else {
-                    v = "";
-                }
-                request.getRequestDispatcher("manageacc?action=search&valueSearch=" + v).forward(request, response);
-
-                break;
-            case "update":
-                id_raw = request.getParameter("id");
-                String st = request.getParameter("status");
-                if (session.getAttribute("v") != null) {
-                    v = (String) session.getAttribute("v");
-                } else {
-                    v = "";
-                }
-                d.updateUser(id_raw, st);
-                request.getRequestDispatcher("manageacc?action=search&valueSearch=" + v).forward(request, response);
-                break;
-            default:
-                request.setAttribute("listU", list);
-                request.getRequestDispatcher("manageAccount.jsp").forward(request, response);
-                break;
+        // Lấy tham số phân trang
+        int page = 1;
+        int size = 5;
+        try {
+            if (request.getParameter("page") != null) {
+                page = Integer.parseInt(request.getParameter("page"));
+            }
+            if (request.getParameter("pageSize") != null) {
+                size = Integer.parseInt(request.getParameter("pageSize"));
+            }
+        } catch (NumberFormatException e) {
+            page = 1;
+            size = 5;
         }
 
-    }
+        String fullname = null, phone = null,  role = null, status = null;
+        // Lấy các tham số filter
+        if (request.getParameter("fullname") != null) {
+            fullname = request.getParameter("fullname").trim().toLowerCase().replaceAll("\\s+", " ");
+        }
+        if(request.getParameter("phone") != null){
+            phone =  request.getParameter("phone").trim().toLowerCase().replaceAll("\\s+", "");
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-          doGet(request, response);
-    }
+        }
+        if(request.getParameter("role") != null){
+            role = request.getParameter("role").toLowerCase();
+        }
+        if(request.getParameter("status") != null){
+            status = request.getParameter("status").toLowerCase();
+        }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+        // Xử lý các hành động add và update
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+        if (action.equalsIgnoreCase("add")) {
+            String userParam = request.getParameter("user");
+            String pass = request.getParameter("pass");
+            String r = request.getParameter("role");
+            // Giả sử status mặc định là "Active" khi thêm
+            Account a = new Account(0, userParam, pass, r, "Active");
+            boolean inserted = d.insertAccount(a);
+            if (inserted) {
+                request.setAttribute("success", "Account added successfully!");
+            } else {
+                request.setAttribute("error", "Failed to add account!");
+            }
+        } else if (action.equalsIgnoreCase("update")) {
+            String id_raw = request.getParameter("id");
+            String newStatus = request.getParameter("status");
+            boolean updated = d.updateUser(id_raw, newStatus);
+            if (updated) {
+                request.setAttribute("success", "Account updated successfully!");
+            } else {
+                request.setAttribute("error", "Failed to update account!");
+            }
+        }
+
+        // Lấy danh sách tài khoản đã được lọc và phân trang từ DAO
+        List<User> listU = d.getAccount(fullname, role, phone, status, page, size);
+
+        // Giả sử bạn có thêm một phương thức đếm tổng số bản ghi theo filter để tính số trang
+        int totalRecords = d.countAccounts(fullname, role, phone, status);
+        int totalPages = (int) Math.ceil((double) totalRecords / size);
+
+        // Gán các giá trị cho JSP
+        request.setAttribute("listU", listU);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("pageSize", size);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("fullname", fullname);
+        request.setAttribute("role", role);
+        request.setAttribute("phone", phone);
+        request.setAttribute("status", status);
+
+        request.getRequestDispatcher("manageAccount.jsp").forward(request, response);
+    }
 
 }

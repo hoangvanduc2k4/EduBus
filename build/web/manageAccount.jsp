@@ -13,65 +13,70 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet" type="text/css"/> 
         <style>
+        
             body {
-                background-color: #fff3e0; /* Nền pastel sáng */
-                color: #4a4a4a; /* Màu chữ tối */
+                background-color: #fff3e0;
+                color: #4a4a4a;
             }
-
             .text_page_head {
-                font-size: 18px;
+                font-size: 22px;
                 font-weight: 600;
-                color: #ff9800; /* Màu vàng cam cho tiêu đề */
+                color: #ff9800;
             }
-
             .text_page {
                 font-size: 14px;
                 font-weight: 600;
-                color: #6d6d6d; /* Màu xám nhẹ cho văn bản */
+                color: #6d6d6d;
             }
-
             .card {
-                border: 1px solid #ffcc80; /* Viền màu vàng cam nhạt cho thẻ */
+                border: 1px solid #ffcc80;
             }
-
             .btn-success {
-                background-color: #ffb74d; /* Màu vàng cam cho nút thêm */
-                border-color: #ffb74d; /* Viền cho nút thêm */
+                background-color: #ffb74d;
+                border-color: #ffb74d;
             }
-
             .btn-warning {
-                background-color: #ffca28; /* Màu vàng cho nút cập nhật trạng thái */
-                border-color: #ffca28; /* Viền cho nút cập nhật trạng thái */
+                background-color: #ffca28;
+                border-color: #ffca28;
             }
-
             .modal-content {
-                background-color: #fff; /* Nền trắng cho modal */
-                border-radius: 8px; /* Bo góc modal */
+                background-color: #fff;
+                border-radius: 8px;
             }
-
             .modal-header, .modal-footer {
-                border: none; /* Bỏ viền cho header và footer của modal */
+                border: none;
             }
-
             .alert-danger {
-                background-color: #ffebee; /* Màu nền pastel cho thông báo lỗi */
-                color: #d32f2f; /* Màu chữ cho thông báo lỗi */
+                background-color: #ffebee;
+                color: #d32f2f;
             }
-
             .alert-success {
-                background-color: #e8f5e9; /* Màu nền pastel cho thông báo thành công */
-                color: #388e3c; /* Màu chữ cho thông báo thành công */
+                background-color: #e8f5e9;
+                color: #388e3c;
             }
-
             .table-hover tbody tr:hover {
-                background-color: #ffe0b2; /* Màu nền khi hover lên dòng bảng */
+                background-color: #ffe0b2;
             }
-
+            /* Style cho phần filter */
+            .filter-form {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: flex-start;
+                margin: 15px 0;
+            }
+            .filter-form .form-group {
+                margin-right: 10px;
+            }
+            /* Style cho phân trang */
+            .pagination {
+                margin: 20px 0;
+                justify-content: center;
+            }
         </style>
     </head>
     <body>
         <c:set var="user" value="${sessionScope.account}" />
-
         <c:if test="${user != null && user.role != 'Admin'}">
             <c:redirect url="accdn.jsp"/>
         </c:if>
@@ -82,28 +87,52 @@
             <div class="container pt-4" style="max-width: 1200px; background-color: #FFCF85">
                 <section class="mb-4">
                     <div class="card">
-                        <div class="row">
-                            <div class="col-sm-4" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-                                <h3 class="mb-0" style="color: #ffb74d"><strong>Manage Account</strong></h3>
-                            </div>
-                            <div class="col-lg-6" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-                                <form action="manageacc" method="GET" style="display: flex; justify-content: center">
-                                    <input type="hidden" name="action" value="search" />
-                                    <input name="valueSearch" value="${rs}" id="searchId" type="text" placeholder="Search user name, phone, fullname" style="width: 60%; padding: 4px 10px; border-radius: 15px">
-                                    <button type="submit" style="border-radius: 50%; width: 40px; font-size: 18px; margin-left: 10px">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </form>
-                            </div>
+                        <!-- Tiêu đề Manage Account ở phần header của card -->
+                        <div class="card-header text-center">
+                            <h2 class="text_page_head">Manage Account</h2>
                         </div>
-
+                        <!-- Form Filter -->
+                        <div class="card-body">
+                            <form action="manageacc" method="GET" class="filter-form">
+                                <input type="hidden" name="action" value="search" />
+                                <div class="form-group">
+                                    <input name="fullname" type="text" class="form-control" placeholder="Full Name" value="${param.fullname}">
+                                </div>
+                                <div class="form-group">
+                                    <select name="role" class="form-control">
+                                        <option value="">-- Select Role --</option>
+                                        <option value="Admin" ${param.role eq 'Admin' ? 'selected' : ''}>Admin</option>
+                                        <option value="Driver" ${param.role eq 'Driver' ? 'selected' : ''}>Driver</option>
+                                        <option value="Parent" ${param.role eq 'Parent' ? 'selected' : ''}>Parent</option>
+                                        <option value="Manager" ${param.role eq 'Manager' ? 'selected' : ''}>Manager</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input name="phone" type="text" class="form-control" placeholder="Phone" value="${param.phone}">
+                                </div>
+                                <div class="form-group">
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Select Status --</option>
+                                        <option value="Active" ${param.status eq 'Active' ? 'selected' : ''}>Active</option>
+                                        <option value="Inactive" ${param.status eq 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-warning">Filter</button>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-warning" id="resetFilterBtn">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Thông báo lỗi / thành công -->
                         <c:if test="${error != null}">
                             <div style="margin-top: 20px" class="alert alert-danger" role="alert">${error}</div>
                         </c:if>
                         <c:if test="${mess != null}">
                             <div style="margin-top: 20px" class="alert alert-success" role="alert">${mess}</div>
                         </c:if>
-
+                        <!-- Bảng hiển thị dữ liệu -->
                         <div class="card-body" style="padding: 0">
                             <div class="table-responsive">
                                 <table class="table table-hover text-nowrap">
@@ -147,11 +176,34 @@
                                 </table>
                             </div>
                         </div>
+                        <!-- Phân trang -->
+                        <div class="col-12" style="margin-top: 1%;">
+                            <div class="d-md-flex align-items-center justify-content-end">
+                                <ul class="pagination justify-content-center mb-0 mt-3 mt-sm-0">
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="manageacc?action=search&page=${currentPage - 1}&fullname=${fullname}&role=${role}&phone=${phone}&status=${status}&pageSize=${pageSize}" style="color: black;">Trước</a>
+                                        </li>
+                                    </c:if>
+                                    <c:forEach begin="1" end="${totalPages}" var="p">
+                                        <li class="page-item ${p == currentPage ? 'active' : ''}">
+                                            <a class="page-link" href="manageacc?action=search&page=${p}&fullname=${fullname}&role=${role}&phone=${phone}&status=${status}&pageSize=${pageSize}"style="color: black; ">${p}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="manageacc?action=search&page=${currentPage + 1}&fullname=${fullname}&role=${role}&phone=${phone}&status=${status}&pageSize=${pageSize}" style="color: black; ">Sau</a>
+                                        </li>
+                                    </c:if>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
         </main>
 
+        <!-- Modal Add Account -->
         <div id="addAccountModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -162,17 +214,19 @@
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">	
+                            <!-- DIV hiển thị lỗi validate, ẩn mặc định -->
+                            <div id="addAccountError" class="alert alert-danger" style="display: none;"></div>
                             <div class="form-group">
                                 <label>Username</label>
-                                <input name="user" type="text" class="form-control" required>
+                                <input name="user" type="text" class="form-control" id="username" required>
                             </div>
                             <div class="form-group">
                                 <label>Password</label>
-                                <input name="pass" type="password" class="form-control" required>
+                                <input name="pass" type="password" class="form-control" id="password" required>
                             </div>
                             <div class="form-group">
                                 <label>Role</label>
-                                <select name="role">
+                                <select name="role" class="form-control">
                                     <option>Admin</option>
                                     <option>Manager</option>
                                     <option>Driver</option>
@@ -189,6 +243,7 @@
             </div>
         </div>
 
+        <!-- Modal Update Status -->
         <div id="updateStatusModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -219,12 +274,87 @@
 
         <jsp:include page="footer.jsp"/>
         <script>
+            // Hàm validate Username bằng JavaScript
+            function validateUsername(username) {
+                if (!username || username.trim() === "") {
+                    return "Username không được để trống.";
+                }
+                var trimmed = username.trim();
+                if (trimmed.length < 8) {
+                    return "Username phải có ít nhất 8 ký tự.";
+                }
+                if (trimmed.length > 30) {
+                    return "Username chỉ được tối đa 30 ký tự.";
+                }
+                var firstChar = trimmed.charAt(0);
+                if (!isNaN(firstChar)) {
+                    return "Ký tự đầu tiên của Username không được là số.";
+                }
+                var regex = /^[a-zA-Z0-9]+$/;
+                if (!regex.test(trimmed)) {
+                    return "Username chỉ được chứa chữ hoặc số (không chứa ký tự đặc biệt).";
+                }
+                return null;
+            }
 
+            // Hàm validate Password bằng JavaScript
+            function validatePassword(password) {
+                if (password.length < 6) {
+                    return false;
+                }
+                var hasUpperCase = false;
+                var hasLowerCase = false;
+                var hasDigit = false;
+                var hasSpecialChar = false;
+                for (var i = 0; i < password.length; i++) {
+                    var c = password.charAt(i);
+                    if (c >= 'A' && c <= 'Z') {
+                        hasUpperCase = true;
+                    } else if (c >= 'a' && c <= 'z') {
+                        hasLowerCase = true;
+                    } else if (c >= '0' && c <= '9') {
+                        hasDigit = true;
+                    } else {
+                        hasSpecialChar = true;
+                    }
+                }
+                return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+            }
+
+            $(document).ready(function () {
+                // Reset Filter form
+                $("#resetFilterBtn").click(function () {
+                    $("form.filter-form input[type='text']").val('');
+                    $("form.filter-form select").prop("selectedIndex", 0);
+                });
+
+                // Validate Add Account form on submit and show errors in DIV
+                $("#form").on("submit", function (e) {
+                    var errorMsgDiv = $("#addAccountError");
+                    errorMsgDiv.hide().html("");
+                    var username = $("#username").val();
+                    var password = $("#password").val();
+                    var usernameError = validateUsername(username);
+                    if (usernameError !== null) {
+                        errorMsgDiv.html(usernameError);
+                        errorMsgDiv.show();
+                        e.preventDefault();
+                        return;
+                    }
+                    if (!validatePassword(password)) {
+                        errorMsgDiv.html("Password không hợp lệ. Phải có ít nhất 6 ký tự, bao gồm chữ in hoa, chữ thường, chữ số và ký tự đặc biệt.");
+                        errorMsgDiv.show();
+                        e.preventDefault();
+                        return;
+                    }
+                });
+            });
+
+            // Setup modal update data
             $('#updateStatusModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
+                var button = $(event.relatedTarget);
                 var id = button.data('id');
                 var status = button.data('status');
-
                 var modal = $(this);
                 modal.find('#updateStatusId').val(id);
                 modal.find('#updateStatusSelect').val(status);

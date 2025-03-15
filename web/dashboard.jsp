@@ -92,7 +92,8 @@
         </div>
 
         <div class="container pt-1" style="margin-left: 240px;">
-            <h1>Statistics</h1> <!-- Thay đổi tiêu đề thành h1 với màu nhẹ nhàng hơn -->
+            <h1>Statistics        <a href="javascript:window.print()"> In </a>
+            </h1> <!-- Thay đổi tiêu đề thành h1 với màu nhẹ nhàng hơn -->
             <div class="row" id="total">
                 <div class="col-xl-6 col-md-6 mb-4">
                     <div class="card">
@@ -167,7 +168,7 @@
                 </div>
             </div>
         </div>
-    </main>
+    </main>         
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://mdbootstrap.com/previews/ecommerce-demo/js/bootstrap.js"></script>
