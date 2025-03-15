@@ -13,7 +13,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet" type="text/css"/> 
         <style>
-        
+
             body {
                 background-color: #fff3e0;
                 color: #4a4a4a;
@@ -281,7 +281,7 @@
                 }
                 var trimmed = username.trim();
                 if (trimmed.length < 8) {
-                    return "Username phải có ít nhất 8 ký tự.";
+                    return "Username must be at least 8 characters long.";
                 }
                 if (trimmed.length > 30) {
                     return "Username chỉ được tối đa 30 ký tự.";
@@ -322,33 +322,66 @@
             }
 
             $(document).ready(function () {
-                // Reset Filter form
-                $("#resetFilterBtn").click(function () {
-                    $("form.filter-form input[type='text']").val('');
-                    $("form.filter-form select").prop("selectedIndex", 0);
-                });
-
-                // Validate Add Account form on submit and show errors in DIV
                 $("#form").on("submit", function (e) {
                     var errorMsgDiv = $("#addAccountError");
-                    errorMsgDiv.hide().html("");
-                    var username = $("#username").val();
+                    errorMsgDiv.hide().html(""); // Reset lỗi
+
                     var password = $("#password").val();
-                    var usernameError = validateUsername(username);
-                    if (usernameError !== null) {
-                        errorMsgDiv.html(usernameError);
-                        errorMsgDiv.show();
+
+                    // Kiểm tra độ dài trước
+                    if (password.length < 6) {
+                        errorMsgDiv.html("Password quá ngắn. Phải có ít nhất 6 ký tự.").show();
                         e.preventDefault();
                         return;
                     }
-                    if (!validatePassword(password)) {
-                        errorMsgDiv.html("Password không hợp lệ. Phải có ít nhất 6 ký tự, bao gồm chữ in hoa, chữ thường, chữ số và ký tự đặc biệt.");
-                        errorMsgDiv.show();
+                    if (password.length > 30) {
+                        errorMsgDiv.html("Password quá dài. Không được quá 30 ký tự.").show();
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra có chữ in hoa
+                    if (!/[A-Z]/.test(password)) {
+                        errorMsgDiv.html("Password phải chứa ít nhất một chữ in hoa.").show();
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra có chữ thường
+                    if (!/[a-z]/.test(password)) {
+                        errorMsgDiv.html("Password phải chứa ít nhất một chữ thường.").show();
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra có số
+                    if (!/[0-9]/.test(password)) {
+                        errorMsgDiv.html("Password phải chứa ít nhất một chữ số.").show();
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra có ký tự đặc biệt
+                    if (!/[\W_]/.test(password)) {
+                        errorMsgDiv.html("Password phải chứa ít nhất một ký tự đặc biệt.").show();
                         e.preventDefault();
                         return;
                     }
                 });
             });
+
+            $(document).ready(function () {
+                $("#resetFilterBtn").click(function () {
+                    var form = $(".filter-form");
+
+                    // Reset tất cả input text về rỗng
+                    form.find("input[type='text']").val('');
+
+                    // Reset select về option đầu tiên
+                    form.find("select").prop("selectedIndex", 0);
+                });
+            });
+
 
             // Setup modal update data
             $('#updateStatusModal').on('show.bs.modal', function (event) {
