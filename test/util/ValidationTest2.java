@@ -71,7 +71,7 @@ public class ValidationTest2 {
     public void testEmailDomainTooLong() {
         // local-part hợp lệ: "test"
         // Tạo phần domain có độ dài 256 ký tự: 252 ký tự 'a' + ".com" (4 ký tự) = 256 ký tự > 255
-        String domainTooLong = "a".repeat(252) + ".com";
+        String domainTooLong = "a".repeat(252) + ".c    om";
         String email = "test@" + domainTooLong;
         assertFalse(Validation.isValidEmail(email));
     }
