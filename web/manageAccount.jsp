@@ -432,6 +432,22 @@
                 modal.find('#updateStatusId').val(id);
                 modal.find('#updateStatusSelect').val(status);
             });
+
+            $(document).ready(function () {
+                $("#resetFilterBtn").click(function () {
+                    var form = $(".filter-form");
+
+                    // Reset tất cả input text về rỗng
+                    form.find("input[type='text']").val('');
+
+                    // Reset select về option đầu tiên
+                    form.find("select").prop("selectedIndex", 0);
+
+                    // Reset radio => bỏ chọn tất cả radio
+                    form.find("input[type='radio']").prop("checked", false);
+                });
+            });
+
         </script>
     </body>
 </html>
