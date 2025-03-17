@@ -73,6 +73,28 @@
                 margin: 20px 0;
                 justify-content: center;
             }
+
+            .filter-form .form-group {
+                display: flex;
+                align-items: center;
+                margin: 0;
+            }
+            .filter-form label {
+                margin-right: 10px;
+                white-space: nowrap;
+            }
+            .filter-form input.form-control,
+            .filter-form select.form-control {
+                border-radius: 4px;
+                margin-left: 5px;
+            }
+            .filter-form .radio-inline {
+                display: inline-flex;
+                align-items: center;
+            }
+            .filter-form button {
+                margin-left: 5px;
+            }
         </style>
     </head>
     <body>
@@ -93,13 +115,15 @@
                         </div>
                         <!-- Form Filter -->
                         <div class="card-body">
-                            <form action="manageacc" method="GET" class="filter-form">
+                            <form action="manageacc" method="GET" class="filter-form" id="filterForm">
                                 <input type="hidden" name="action" value="search" />
+
                                 <div class="form-group">
-                                    <input name="fullname" type="text" class="form-control" placeholder="Full Name" value="${param.fullname}">
+                                    <input id="fullname" name="fullname" type="text" class="form-control" placeholder="Full Name" value="${param.fullname}">
                                 </div>
+
                                 <div class="form-group">
-                                    <select name="role" class="form-control">
+                                    <select id="role" name="role" class="form-control">
                                         <option value="">-- Select Role --</option>
                                         <option value="Admin" ${param.role eq 'Admin' ? 'selected' : ''}>Admin</option>
                                         <option value="Driver" ${param.role eq 'Driver' ? 'selected' : ''}>Driver</option>
@@ -107,19 +131,26 @@
                                         <option value="Manager" ${param.role eq 'Manager' ? 'selected' : ''}>Manager</option>
                                     </select>
                                 </div>
+
                                 <div class="form-group">
-                                    <input name="phone" type="text" class="form-control" placeholder="Phone" value="${param.phone}">
+                                    <input id="phone" name="phone" type="text" class="form-control" placeholder="Phone" value="${param.phone}">
                                 </div>
+
                                 <div class="form-group">
-                                    <select name="status" class="form-control">
-                                        <option value="">-- Select Status --</option>
-                                        <option value="Active" ${param.status eq 'Active' ? 'selected' : ''}>Active</option>
-                                        <option value="Inactive" ${param.status eq 'Inactive' ? 'selected' : ''}>Inactive</option>
-                                    </select>
+                                    <div style="display: flex; align-items: center;">
+                                        <label class="radio-inline">
+                                            <input type="radio" style="margin-right: 20px; margin-left: 40px;"  name="status" value="Active" ${param.status eq 'Active' ? 'checked' : ''}> Active
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" style="margin-right: 20px; margin-left: 40px;" name="status" value="Inactive" ${param.status eq 'Inactive' ? 'checked' : ''}> Inactive
+                                        </label>
+                                    </div>
                                 </div>
+
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-warning">Filter</button>
                                 </div>
+
                                 <div class="form-group">
                                     <button type="button" class="btn btn-warning" id="resetFilterBtn">Reset</button>
                                 </div>
@@ -274,14 +305,14 @@
 
         <jsp:include page="footer.jsp"/>
         <script>
-            // Hàm validate Username bằng JavaScript
+// Hàm kiểm tra username
             function validateUsername(username) {
                 if (!username || username.trim() === "") {
                     return "Username không được để trống.";
                 }
                 var trimmed = username.trim();
                 if (trimmed.length < 8) {
-                    return "Username must be at least 8 characters long.";
+                    return "Username phải có ít nhất 8 ký tự.";
                 }
                 if (trimmed.length > 30) {
                     return "Username chỉ được tối đa 30 ký tự.";
@@ -326,9 +357,18 @@
                     var errorMsgDiv = $("#addAccountError");
                     errorMsgDiv.hide().html(""); // Reset lỗi
 
+                    var username = $("#username").val();
                     var password = $("#password").val();
 
-                    // Kiểm tra độ dài trước
+                    // Kiểm tra username trước
+                    var usernameError = validateUsername(username);
+                    if (usernameError !== null) {
+                        errorMsgDiv.html(usernameError).show();
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Kiểm tra độ dài password
                     if (password.length < 6) {
                         errorMsgDiv.html("Password quá ngắn. Phải có ít nhất 6 ký tự.").show();
                         e.preventDefault();

@@ -287,7 +287,7 @@
                 <form action="login" method="post" id="login-form">
                     <h1>Sign in</h1>
                     <c:set var="cookie"  value="${pageContext.request.cookies}"/>
-                    <input type="text" placeholder="Username" value="${cookie.cu.value}" name="user" required/>
+                    <input type="text" placeholder="Username" value="${cookie.cu.value}" name="user" id="username" required/>
                     <input type="password" placeholder="Password" value="${cookie.cp.value}" name="pass" id="pass" required/>
                     <span class="toggle-password" onclick="togglePassword()">Show</span>
                     <div style="display: flex; justify-content: space-around; width: 284px">
