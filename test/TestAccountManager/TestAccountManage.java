@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import java.time.Duration;
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -200,49 +201,86 @@ public class TestAccountManage {
                 errorMsg.contains("Ký tự đầu tiên của Username không được"));
     }
 
-    /**
-     * 5) Test Add Account với Invalid Password (quá ngắn) - Mở modal "Add
-     * Account" - Điền username hợp lệ - Điền password chỉ 4 ký tự - Submit -
-     * Kiểm tra thông báo lỗi
-     */
     @Test
     public void testAddInvalidPassword() {
+        // Mở modal "Add Account" bằng cách click vào nút "+" ở header bảng
 
-
+        // Chờ modal "Add Account" hiển thị
         WebElement addAccountModal = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.id("addAccountModal"))
         );
 
-        // Username hợp lệ
+        // Điền Username hợp lệ
         WebElement modalUsername = addAccountModal.findElement(By.id("username"));
         modalUsername.clear();
         modalUsername.sendKeys("newuser01");
 
-        // Password không hợp lệ: chỉ 4 ký tự
+        // Điền Password không hợp lệ: chỉ 4 ký tự (yêu cầu ít nhất 6 ký tự)
         WebElement modalPassword = addAccountModal.findElement(By.id("password"));
         modalPassword.clear();
         modalPassword.sendKeys("Ab1!");
 
-        // Chọn role "Manager"
+        // Chọn Role (ví dụ: "Manager")
         Select modalRole = new Select(addAccountModal.findElement(By.name("role")));
         modalRole.selectByVisibleText("Manager");
 
-        // Click Add
+        // Click nút Add để submit form
         WebElement addSubmit = addAccountModal.findElement(By.xpath("//input[@type='submit' and @value='Add']"));
         addSubmit.click();
 
-        // Chờ thông báo lỗi
-        WebElement errorDiv = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.id("addAccountError"))
-        );
+        // Chờ thông báo lỗi hiển thị trong modal (div có id "addAccountError")
+        WebElement errorDiv = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("addAccountError")));
         String errorMsg = errorDiv.getText();
+        assertTrue("Thông báo lỗi phải chứa 'Password quá ngắn'", errorMsg.contains("Password quá ngắn"));
 
-        assertTrue("Thông báo lỗi phải chứa 'Password quá ngắn'",
-                errorMsg.contains("Password quá ngắn"));
+        // Đóng modal "Add Account" bằng cách ấn nút Cancel
+        WebElement cancelButton = wait.until(ExpectedConditions.elementToBeClickable(
+                addAccountModal.findElement(By.xpath("//input[@type='button' and @value='Cancel']"))
+        ));
+        cancelButton.click();
+
+        // Chờ cho đến khi modal biến mất
+        wait.until(ExpectedConditions.invisibilityOf(addAccountModal));
+    }
+
+    
+    @Test
+    public void testPaginationFirstPage() {
+        // 1. Điều hướng thẳng tới /manageacc?page=1 (giả sử link đầy đủ)
+        driver.get("http://localhost:9999/EduBusSystem/manageacc?action=search&page=1");
+
+        // 2. Kiểm tra nút "Trước" (text = "Trước") có ẩn hoặc không xuất hiện
+        //    Nếu JSP hiển thị conditionally, ta có thể:
+        List<WebElement> prevButtons = driver.findElements(By.xpath("//a[contains(text(),'Trước')]"));
+        // Nếu đang ở page=1 và code JSP ẩn nút "Trước" => list này rỗng
+        assertTrue("Nút 'Trước' không được hiển thị ở page=1", prevButtons.isEmpty());
+
+        // 3. Kiểm tra có các link 2,3,4,... (nếu totalPages > 1)
+        //    Ta tìm tất cả <li> trong <ul class="pagination"> => text = "2", "3", ...
+        WebElement paginationUl = driver.findElement(By.cssSelector("ul.pagination"));
+        List<WebElement> pageLinks = paginationUl.findElements(By.tagName("a"));
+
+        boolean found2 = false;
+        boolean foundNext = false;
+        for (WebElement link : pageLinks) {
+            String text = link.getText().trim();
+            if ("2".equals(text)) {
+                found2 = true;
+            }
+            if ("Sau".equals(text)) {
+                foundNext = true;
+            }
+        }
+
+        // 4. Nếu totalPages > 1, thì phải có link "2" và link "Sau"
+        //    (trừ khi totalPages=1 => link "Sau" cũng ẩn)
+        //    Tùy logic JSP, bạn có thể thay đổi kiểm tra này.
+        assertTrue("Phải có link '2' nếu totalPages > 1", found2);
+        assertTrue("Phải có nút 'Sau' nếu totalPages > 1", foundNext);
     }
 
     @AfterClass
     public static void tearDownClass() {
-        driver.quit();
+        //  driver.quit();
     }
 }
