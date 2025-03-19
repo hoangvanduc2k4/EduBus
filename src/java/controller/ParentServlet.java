@@ -7,12 +7,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import model.Account;
 import model.Parent;
-import util.Validation; // import lớp Validation
+import util.Validation;
 
 public class ParentServlet extends HttpServlet {
 
@@ -23,12 +24,80 @@ public class ParentServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Account a = (Account) session.getAttribute("account");
-        List<Parent> listP = d.getParentByAccId(a.getAccountid() + "");
+
+        // Lấy tham số phân trang
+        int page = 1;
+        int pageSize = 2;
+        try {
+            String pageStr = request.getParameter("page");
+            if (pageStr != null) {
+                page = Integer.parseInt(pageStr);
+            }
+        } catch (NumberFormatException e) {
+        }
+
+        try {
+            String pageSizeStr = request.getParameter("pageSize");
+            if (pageSizeStr != null) {
+                pageSize = Integer.parseInt(pageSizeStr);
+            }
+        } catch (NumberFormatException e) {
+            // Giữ nguyên pageSize = 5
+        }
+
+        // Lấy các tham số tìm kiếm (nếu có)
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String dob = request.getParameter("dob");
+        String gender = request.getParameter("gender");
+        String role = request.getParameter("role");
+
+        // Chuyển dob sang Date nếu không null
+        java.sql.Date sqlDob = null;
+        if (dob != null && !dob.trim().isEmpty()) {
+            try {
+                java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(dob);
+                sqlDob = new java.sql.Date(utilDate.getTime());
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // Đếm tổng số Parent thỏa mãn tìm kiếm
+        int totalRecords = d.countParents(name, email, phone, sqlDob, gender, role, a.getAccountid());
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        // Lấy danh sách Parent với phân trang
+        List<Parent> listP = d.searchParents(name, email, phone, sqlDob, gender, role, a.getAccountid(), page, pageSize);
+
+        // Lấy list role (nếu cần)
+        List<String> roles = null;
+        try {
+            roles = d.getDistinctParentRoles();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        // Đưa các biến cần thiết về JSP
         request.setAttribute("listP", listP);
+        request.setAttribute("listR", roles);
+
+        // Đưa các tham số tìm kiếm & phân trang để giữ trạng thái trên form
+        request.setAttribute("name", name);
+        request.setAttribute("email", email);
+        request.setAttribute("phone", phone);
+        request.setAttribute("dob", dob);
+        request.setAttribute("gender", gender);
+        request.setAttribute("role", role);
+
+        request.setAttribute("currentPage", page);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("totalPages", totalPages);
+
         request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action") == null
@@ -52,12 +121,9 @@ public class ParentServlet extends HttpServlet {
                 if (img.isBlank()) {
                     img = "image/default.jpg";
                 }
-                // Kiểm tra email hợp lệ
                 if (!Validation.isValidEmail(email)) {
                     request.setAttribute("error", "Địa chỉ email không hợp lệ.");
-                    // Thiết lập flag mở lại modal Add
                     request.setAttribute("modalToOpen", "add");
-                    // Giữ lại dữ liệu vừa nhập
                     request.setAttribute("name", name);
                     request.setAttribute("email", email);
                     request.setAttribute("phone", phone);
@@ -65,7 +131,8 @@ public class ParentServlet extends HttpServlet {
                     request.setAttribute("dob", dob);
                     request.setAttribute("role", role);
                     request.setAttribute("img", img);
-                    List<Parent> listP = d.getParentByAccId(a.getAccountid() + "");
+                    // Sử dụng searchParents thay vì getParentByAccId, chỉ lấy Parent thuộc Account đã đăng nhập
+                    List<Parent> listP = d.searchParents("", "", "", null, "", "", a.getAccountid(), 1, 5);
                     request.setAttribute("listP", listP);
                     request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
                     return;
@@ -76,7 +143,6 @@ public class ParentServlet extends HttpServlet {
                     Parent p = new Parent(0, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
                     d.insert(p);
                 } catch (ParseException e) {
-                    // Có thể xử lý thông báo lỗi định dạng ngày nếu cần
                 }
                 break;
 
@@ -92,11 +158,9 @@ public class ParentServlet extends HttpServlet {
                 if (img.isBlank()) {
                     img = "image/default.jpg";
                 }
-                // Kiểm tra email hợp lệ cho update
-                // Trong case "update":
+
                 if (!Validation.isValidEmail(email)) {
                     request.setAttribute("error", "Địa chỉ email không hợp lệ.");
-                    // Thiết lập flag mở lại modal Update
                     request.setAttribute("modalToOpen", "update");
                     request.setAttribute("updateId", idr);
                     request.setAttribute("name", name);
@@ -106,7 +170,8 @@ public class ParentServlet extends HttpServlet {
                     request.setAttribute("dob", dob);
                     request.setAttribute("role", role);
                     request.setAttribute("img", img);
-                    List<Parent> listP = d.getParentByAccId(a.getAccountid() + "");
+                    // Sử dụng searchParents thay vì getParentByAccId, chỉ lấy Parent thuộc Account đã đăng nhập
+                    List<Parent> listP = d.searchParents("", "", "", null, "", "", a.getAccountid(), 1, 5);
                     request.setAttribute("listP", listP);
                     request.getRequestDispatcher("parentinfo.jsp").forward(request, response);
                     return;
@@ -119,7 +184,6 @@ public class ParentServlet extends HttpServlet {
                     Parent p = new Parent(id, name, email, phone, gender, sqlDate, role, img, a.getAccountid());
                     d.update(p);
                 } catch (ParseException e) {
-                    // Xử lý lỗi định dạng ngày nếu cần
                 }
                 break;
         }
