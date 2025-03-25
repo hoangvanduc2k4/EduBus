@@ -11,6 +11,22 @@ import java.util.regex.Pattern;
  */
 public class Validation {
 
+    private static final Pattern EMAIL_REGEX
+            = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+
+    // Full name: không toàn dấu cách, không số/ký tự đặc biệt,
+    // mỗi từ cách nhau đúng 1 dấu cách.
+    // Ví dụ regex cho tiếng Anh cơ bản (A-Z không dấu):
+    private static final Pattern FULLNAME_REGEX
+            = Pattern.compile("^[A-Za-z]+(?: [A-Za-z]+)*$");
+
+    // Phone: tối đa 10 số, không ký tự đặc biệt/không dấu cách,
+    // phải bắt đầu bằng 0
+    // -> Cho phép 1-10 chữ số, ký tự đầu là '0': ^0[0-9]{0,9}$
+    // Nếu bạn muốn **chính xác 10 số** thì dùng: ^0[0-9]{9}$
+    private static final Pattern PHONE_REGEX
+            = Pattern.compile("^0[0-9]{0,9}$");
+
     public static String validateDob(String dob) {
         if (dob.trim().isEmpty()) {
             return "Ngày sinh không được để trống.";
@@ -111,8 +127,8 @@ public class Validation {
         String[] parts = email.split("@");
         return !(parts[0].length() > 64 || parts[1].length() > 255);
     }
-    
-        public boolean validatePassword(String str) {
+
+    public boolean validatePassword(String str) {
         //check length of string
         if (str.length() < 6) {
             return false;
@@ -138,4 +154,21 @@ public class Validation {
 
         return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
     }
+
+    
+
+    public static boolean isValidFullName(String name) {
+        if (name == null) {
+            return false;
+        }
+        String trimmed = name.trim();
+        // Nếu chỉ nhập dấu cách => rỗng sau trim
+        if (trimmed.isEmpty()) {
+            return false;
+        }
+        // Kiểm tra regex
+        return FULLNAME_REGEX.matcher(trimmed).matches();
+    }
+
+   
 }

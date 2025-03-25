@@ -4,7 +4,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Thông tin phụ huynh</title>
+        <title>Parent Information</title>
         <link rel="icon" href="images/logo1.png"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
@@ -24,12 +24,14 @@
                 font-size: 14px;
                 font-weight: 600;
             }
+            #errorMessages p, #formErrorMessages p {
+                margin-bottom: 5px;
+            }
         </style>
     </head>
 
     <body>
         <c:set var="user" value="${sessionScope.account}" />
-
         <c:if test="${user != null && user.role != 'Parent'}">
             <c:redirect url="accdn.jsp"/>
         </c:if>
@@ -38,60 +40,58 @@
         <div style="display: block; margin-top: 7%;"></div>
 
         <main>
-         
             <div class="container pt-4" style="max-width: 1200px">
                 <section class="mb-4">
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger">${errorMessage}</div>
+                    </c:if>
 
-                    <form id="searchForm" class="mb-4">
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${successMessage}</div>
+                    </c:if>
+
+                    <div id="errorMessages" class="alert alert-danger mt-2" style="display: none;"></div>
+                    <form id="searchForm" class="mb-4" action="parentinfo" method="GET">
                         <div class="form-row">
                             <div class="col-md-2">
-                                <input type="text" id="searchFullName" class="form-control" placeholder="Search Full Name">
+                                <input type="text" id="searchFullName" name="name" class="form-control" placeholder="Search Full Name" value="${name}">
                             </div>
                             <div class="col-md-2">
-                                <input type="text" id="searchEmail" class="form-control" placeholder="Search Email">
+                                <input type="text" id="searchEmail" name="email" class="form-control" placeholder="Search Email" value="${email}">
                             </div>
                             <div class="col-md-2">
-                                <input type="text" id="searchPhone" class="form-control" placeholder="Search Phone">
+                                <input type="text" id="searchPhone" name="phone" class="form-control" placeholder="Search Phone" value="${phone}">
                             </div>
                             <div class="col-md-2">
-                                <input type="date" id="searchDOB" class="form-control" placeholder="Search Date of Birth">
+                                <input type="date" id="searchDOB" name="dob" class="form-control" placeholder="Search Date of Birth" value="${dob}">
                             </div>
                             <div class="col-md-2">
-                                <!-- Checkbox cho Gender -->
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" name="gender" type="radio" id="genderMale" value="Male">
-                                    <label class="form-check-label" for="genderMale">Male</label>
+                                    <input class="form-check-input" name="gender" type="radio" id="genderMale" value="Male" <c:if test="${gender == 'Male'}">checked</c:if>>
+                                        <label class="form-check-label" for="genderMale">Male</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" name="gender" type="radio" id="genderFemale" value="Female" <c:if test="${gender == 'Female'}">checked</c:if>>
+                                        <label class="form-check-label" for="genderFemale">Female</label>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" name="gender" type="radio" id="genderFemale" value="Female">
-                                    <label class="form-check-label" for="genderFemale">Female</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <select id="searchRole" class="form-control">
-                                    <option value="">All Roles</option>
-                                    <c:forEach var="role" items="${listR}">
-                                        <option value="${role}">${role}</option>
+                                <div class="col-md-2">
+                                    <select id="searchRole" name="role" class="form-control">
+                                        <option value="">All Roles</option>
+                                    <c:forEach var="r" items="${listR}">
+                                        <option value="${r}" <c:if test="${r == role}">selected</c:if>>${r}</option>
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-md-2" id="customRoleDiv" style="display: none;">
-                                <input type="text" id="customRole" class="form-control" placeholder="Enter custom role">
-                            </div>
-
                         </div>
                         <div class="form-row mt-2">
                             <div class="col">
                                 <button type="submit" class="btn btn-primary">Search</button>
                             </div>
                             <div class="col">
-                                <button class="btn btn-primary" onclick="window.location.href = 'parentinfo'">
-                                    All Parent
-                                </button>                           
+                                <button type="button" class="btn btn-primary" onclick="window.location.href = 'parentinfo'">All Parent</button>                           
                             </div>
                         </div>
-
                     </form>
 
                     <a href="changepass.jsp" class="btn btn-warning change-pass-btn">
@@ -123,7 +123,7 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody id="contentt">
+                                    <tbody>
                                         <c:forEach items="${listP}" var="p">
                                             <tr>
                                                 <td class="text_page" style="font-weight: 500">${p.name}</td>
@@ -137,13 +137,8 @@
                                                 <td class="text_page" style="font-weight: 500">${p.role}</td>
                                                 <td class="text_page" style="padding: 0 12px 16px">
                                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateParentModal" 
-                                                            data-id="${p.pid}" 
-                                                            data-name="${p.name}" 
-                                                            data-email="${p.email}" 
-                                                            data-phone="${p.phone}" 
-                                                            data-gender="${p.gender}" 
-                                                            data-dob="${p.dob}" 
-                                                            data-role="${p.role}">
+                                                            data-id="${p.pid}" data-name="${p.name}" data-email="${p.email}" data-phone="${p.phone}" 
+                                                            data-gender="${p.gender}" data-dob="${p.dob}" data-role="${p.role}">
                                                         <i class="fa-solid fa-pen" data-toggle="tooltip" title="Cập nhật"></i>
                                                     </button>
                                                 </td>
@@ -157,37 +152,26 @@
                 </section>
             </div>
 
-            <!-- Phân trang -->
             <div class="row mt-3">
                 <div class="col-md-12">
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center">
-                            <!-- Nút Previous -->
                             <c:if test="${currentPage > 1}">
                                 <li class="page-item">
-                                    <a class="page-link" href="parentinfo?page=${currentPage - 1}&pageSize=${pageSize}
-                                       &name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
+                                    <a class="page-link" href="parentinfo?page=${currentPage - 1}&pageSize=${pageSize}&name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}" aria-label="Previous">
                                         Trước
                                     </a>
                                 </li>
                             </c:if>
-                            <!-- Số trang -->
                             <c:forEach var="i" begin="1" end="${totalPages}">
                                 <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="parentinfo?page=${i}&pageSize=${pageSize}
-                                       &name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}">
-                                        ${i}
-                                    </a>
+                                    <a class="page-link" href="parentinfo?page=${i}&pageSize=${pageSize}&name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}">${i}</a>
                                 </li>
                             </c:forEach>
-                            <!-- Nút Next -->
                             <c:if test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="parentinfo?page=${currentPage + 1}&pageSize=${pageSize}
-                                       &name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}" aria-label="Next">
+                                    <a class="page-link" href="parentinfo?page=${currentPage + 1}&pageSize=${pageSize}&name=${name}&email=${email}&phone=${phone}&dob=${dob}&gender=${gender}&role=${role}" aria-label="Next">
                                         Sau
-                                        <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
                             </c:if>
@@ -197,54 +181,62 @@
             </div>
         </main>
 
-
-        <!-- Add Parent Modal -->
         <div id="addParentModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
+
+                    <c:if test="${not empty errorMessage}">
+                        <div id="errorAdd" class="alert alert-danger">${errorMessage}</div>
+                    </c:if>
                     <form id="form" action="parentinfo" method="post">
+
+                        <!-- Hidden fields lưu các tham số phân trang và search hiện tại -->
+                        <input type="hidden" name="page" value="${currentPage}" />
+                        <input type="hidden" name="pageSize" value="${pageSize}" />
+                        <input type="hidden" name="searchName" value="${name}" />
+                        <input type="hidden" name="searchEmail" value="${email}" />
+                        <input type="hidden" name="searchPhone" value="${phone}" />
+                        <input type="hidden" name="searchDob" value="${dob}" />
+                        <input type="hidden" name="searchGender" value="${gender}" />
+                        <input type="hidden" name="searchRole" value="${role}" />
+
                         <input type="hidden" name="action" value="add" />
                         <div class="modal-header">
                             <h4 class="modal-title">Add Member</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         </div>
                         <div class="modal-body">
+                            <div id="formErrorMessages" class="alert alert-danger" style="display: none;"></div>
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input name="name" type="text" class="form-control" required
-                                       value="${modalToOpen == 'add' ? name : ''}">
+                                <input name="name" type="text" class="form-control" required value="${modalToOpen == 'add' ? name : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input name="email" type="text" class="form-control" required
-                                       value="${modalToOpen == 'add' ? email : ''}">
+                                <input name="email" type="text" class="form-control" required value="${modalToOpen == 'add' ? email : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Phone:</label>
-                                <input name="phone" type="text" class="form-control" required
-                                       value="${modalToOpen == 'add' ? phone : ''}">
+                                <input name="phone" type="text" class="form-control" required value="${modalToOpen == 'add' ? phone : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Gender</label>
                                 <select name="gender" class="form-control">
-                                    <option value="Male" ${modalToOpen == 'add' and gender == 'Male' ? 'selected' : ''}>Male</option>
-                                    <option value="Female" ${modalToOpen == 'add' and gender == 'Female' ? 'selected' : ''}>Female</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Date of birth:</label>
-                                <input name="dob" type="date" class="form-control" required
-                                       value="${modalToOpen == 'add' ? dob : ''}">
+                                    <option value="Male" <c:if test="${modalToOpen == 'add' and gender == 'Male'}">selected</c:if>>Male</option>
+                                    <option value="Female" <c:if test="${modalToOpen == 'add' and gender == 'Female'}">selected</c:if>>Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date of birth:</label>
+                                    <input name="dob" type="date" class="form-control" required value="${modalToOpen == 'add' ? dob : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Role in Family:</label>
-                                <input name="role" type="text" class="form-control" required
-                                       value="${modalToOpen == 'add' ? role : ''}">
+                                <input name="role" type="text" class="form-control" required value="${modalToOpen == 'add' ? role : ''}">
                             </div>
                             <div class="form-group">
                                 <label>Image(URL):</label>
-                                <input id="updateImg" name="img" type="text" class="form-control"
-                                       value="${modalToOpen == 'add' ? img : ''}">
+                                <input id="updateImg" name="img" type="text" class="form-control" value="${modalToOpen == 'add' ? img : ''}">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -256,71 +248,61 @@
             </div>
         </div>
 
-        <!-- Update Parent Modal -->
         <div id="updateParentModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="updateForm" action="parentinfo" method="post">
+                    <form action="parentinfo" method="post">
                         <input type="hidden" name="action" value="update" />
-                        <input type="hidden" name="id" id="updateId" value="${updateId != null ? updateId : ''}"/>
                         <div class="modal-header">
                             <h4 class="modal-title">Update Member</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         </div>
                         <div class="modal-body">
-                            <!-- Các trường nhập liệu cho update member -->
+                            <input type="hidden" id="updateId" name="id" />
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input id="updateName" name="name" type="text" class="form-control" required
-                                       value="${name != null ? name : ''}">
+                                <input id="updateName" name="name" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input id="updateEmail" name="email" type="text" class="form-control" required
-                                       value="${email != null ? email : ''}">
+                                <input id="updateEmail" name="email" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Phone:</label>
-                                <input id="updatePhone" name="phone" type="text" class="form-control" required
-                                       value="${phone != null ? phone : ''}">
+                                <label>Phone</label>
+                                <input id="updatePhone" name="phone" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Gender</label>
                                 <select id="updateGender" name="gender" class="form-control">
-                                    <option value="Male" ${gender == 'Male' ? 'selected' : ''}>Male</option>
-                                    <option value="Female" ${gender == 'Female' ? 'selected' : ''}>Female</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Date of birth:</label>
-                                <input id="updateDOB" name="dob" type="date" class="form-control" required
-                                       value="${dob != null ? dob : ''}">
+                                <input id="updateDOB" name="dob" type="date" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Role in Family:</label>
-                                <input id="updateRole" name="role" type="text" class="form-control" required
-                                       value="${role != null ? role : ''}">
+                                <input id="updateRole" name="role" type="text" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Image(URL):</label>
-                                <input id="updateImg" name="img" type="text" class="form-control"
-                                       value="${img != null ? img : ''}">
+                                <input id="updateImg" name="img" type="text" class="form-control">
                             </div>
                         </div>
-
                         <div class="modal-footer">
                             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                            <input type="submit" class="btn btn-success" value="Update">
+                            <input type="submit" class="btn btn-info" value="Save">
                         </div>
-
-                    </form>      
+                    </form>
                 </div>
             </div>
         </div>
+
         <jsp:include page="footer.jsp"/>
 
         <script>
-            // Xử lý modal cập nhật (update)
             $('#updateParentModal').on('show.bs.modal', function (event) {
                 if (event.relatedTarget) {
                     var button = $(event.relatedTarget);
@@ -331,9 +313,8 @@
                     var gender = button.data('gender');
                     var dob = button.data('dob');
                     var role = button.data('role');
-                    var img = button.find('img').attr('src'); // Lấy URL hình ảnh
+                    var img = button.closest('tr').find('img').attr('src');
 
-                    // Cập nhật nội dung modal
                     var modal = $(this);
                     modal.find('#updateId').val(id);
                     modal.find('#updateName').val(name);
@@ -347,316 +328,95 @@
             });
 
             $(document).ready(function () {
-                // Hiển thị modal theo yêu cầu
                 var modalToOpen = "${modalToOpen}";
                 if (modalToOpen === "update") {
                     $('#updateParentModal').modal('show');
                 } else if (modalToOpen === "add") {
                     $('#addParentModal').modal('show');
                 }
-
-                // Xử lý tìm kiếm khi submit form
-                $("#searchForm").on("submit", function (e) {
-                    e.preventDefault();
-                    var searchFullName = $("#searchFullName").val().toLowerCase();
-                    var searchEmail = $("#searchEmail").val().toLowerCase();
-                    var searchPhone = $("#searchPhone").val().toLowerCase();
-                    var searchDOB = $("#searchDOB").val().toLowerCase();
-
-                    // Lấy các checkbox đã được chọn
-                    var selectedGender = [];
-                    if ($("#genderMale").is(":checked")) {
-                        selectedGender.push("male");
-                    }
-                    if ($("#genderFemale").is(":checked")) {
-                        selectedGender.push("female");
-                    }
-
-                    // Lấy giá trị role (nếu chưa chọn thì là "")
-                    var searchRole = $("#searchRole").val().toLowerCase();
-
-                    $("#contentt tr").filter(function () {
-                        var fullName = $(this).find("td").eq(0).text().toLowerCase();
-                        var email = $(this).find("td").eq(2).text().toLowerCase();
-                        var phone = $(this).find("td").eq(3).text().toLowerCase();
-                        var gender = $(this).find("td").eq(4).text().toLowerCase();
-                        var dob = $(this).find("td").eq(5).text().toLowerCase();
-                        var role = $(this).find("td").eq(6).text().toLowerCase();
-
-                        // Kiểm tra nếu có lựa chọn checkbox, thì gender của dòng phải khớp với một trong các giá trị đã chọn
-                        var genderMatch = selectedGender.length === 0 || selectedGender.indexOf(gender) > -1;
-
-                        // Nếu role đã chọn (khác rỗng) thì phải khớp
-                        var roleMatch = searchRole === "" || role === searchRole;
-
-                        return fullName.indexOf(searchFullName) > -1 &&
-                                email.indexOf(searchEmail) > -1 &&
-                                phone.indexOf(searchPhone) > -1 &&
-                                dob.indexOf(searchDOB) > -1 &&
-                                genderMatch &&
-                                roleMatch;
-                    }).show().end().filter(function () {
-                        // Ẩn những dòng không khớp
-                        var fullName = $(this).find("td").eq(0).text().toLowerCase();
-                        var email = $(this).find("td").eq(2).text().toLowerCase();
-                        var phone = $(this).find("td").eq(3).text().toLowerCase();
-                        var gender = $(this).find("td").eq(4).text().toLowerCase();
-                        var dob = $(this).find("td").eq(5).text().toLowerCase();
-                        var role = $(this).find("td").eq(6).text().toLowerCase();
-
-                        var genderMatch = selectedGender.length === 0 || selectedGender.indexOf(gender) > -1;
-                        var roleMatch = searchRole === "" || role === searchRole;
-
-                        return !(fullName.indexOf(searchFullName) > -1 &&
-                                email.indexOf(searchEmail) > -1 &&
-                                phone.indexOf(searchPhone) > -1 &&
-                                dob.indexOf(searchDOB) > -1 &&
-                                genderMatch &&
-                                roleMatch);
-                    }).hide();
-                });
             });
-        </script>
-        <script>
+
             $("#searchForm").on("submit", function (e) {
-                // Ngăn không cho submit form theo mặc định và ngăn chặn các xử lý sự kiện sau nếu lỗi xảy ra
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
                 var isValid = true;
                 var errorMsg = "";
+                var $errorDiv = $("#errorMessages");
 
-                // Lấy giá trị ban đầu và giá trị đã trim cho các trường
+                $errorDiv.hide().empty();
+
                 var searchFullNameOrig = $("#searchFullName").val();
                 var searchFullName = $.trim(searchFullNameOrig);
-
                 var searchEmailOrig = $("#searchEmail").val();
                 var searchEmail = $.trim(searchEmailOrig);
-
                 var searchPhoneOrig = $("#searchPhone").val();
                 var searchPhone = $.trim(searchPhoneOrig);
-
                 var searchDOB = $.trim($("#searchDOB").val());
 
-                // Kiểm tra nếu nhập toàn khoảng trắng cho các trường (với điều kiện ban đầu có ký tự nhưng sau trim bằng rỗng)
                 if (searchFullNameOrig.length > 0 && searchFullName === "") {
                     isValid = false;
-                    errorMsg += "Search Full Name không được nhập toàn dấu cách.\n";
-                    $("#searchFullName").val(""); // xóa giá trị sai
+                    errorMsg += "<p>Search Full Name không được nhập toàn dấu cách.</p>";
+                    $("#searchFullName").val("");
                 }
                 if (searchEmailOrig.length > 0 && searchEmail === "") {
                     isValid = false;
-                    errorMsg += "Search Email không được nhập toàn dấu cách.\n";
+                    errorMsg += "<p>Search Email không được nhập toàn dấu cách.</p>";
                     $("#searchEmail").val("");
                 }
                 if (searchPhoneOrig.length > 0 && searchPhone === "") {
                     isValid = false;
-                    errorMsg += "Search Phone không được nhập toàn dấu cách.\n";
+                    errorMsg += "<p>Search Phone không được nhập toàn dấu cách.</p>";
                     $("#searchPhone").val("");
                 }
 
-                // Validate Search Full Name (nếu không rỗng)
                 if (searchFullName !== "") {
-                    // Chỉ cho phép chữ cái và dấu cách (giữa các từ chỉ có 1 dấu cách)
                     var nameRegex = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
                     if (!nameRegex.test(searchFullName)) {
                         isValid = false;
-                        errorMsg += "Search Full Name chỉ được chứa chữ cái, không nhập số hay ký tự đặc biệt và chỉ được phép có 1 dấu cách giữa các từ.\n";
+                        errorMsg += "<p>Search Full Name chỉ được chứa chữ cái, không nhập số hay ký tự đặc biệt và chỉ được phép có 1 dấu cách giữa các từ.</p>";
                         $("#searchFullName").val("");
                     }
                 }
 
-                // Validate Search Email (nếu không rỗng)
                 if (searchEmail !== "") {
                     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(searchEmail)) {
                         isValid = false;
-                        errorMsg += "Search Email phải đúng định dạng email.\n";
+                        errorMsg += "<p>Search Email phải đúng định dạng email.</p>";
                         $("#searchEmail").val("");
                     }
                 }
 
-                // Validate Search Phone (nếu không rỗng)
                 if (searchPhone !== "") {
-                    // Chỉ cho phép số (tối đa 10 chữ số, không chứa ký tự hay khoảng trắng)
                     var phoneRegex = /^[0-9]{1,10}$/;
                     if (!phoneRegex.test(searchPhone)) {
                         isValid = false;
-                        errorMsg += "Search Phone chỉ được nhập tối đa 10 chữ số, không chứa ký tự hay khoảng trắng.\n";
+                        errorMsg += "<p>Search Phone chỉ được nhập tối đa 10 chữ số, không chứa ký tự hay khoảng trắng.</p>";
                         $("#searchPhone").val("");
                     }
                 }
 
-                // Validate Search Date (nếu không rỗng)
                 if (searchDOB !== "") {
                     var inputDate = new Date(searchDOB);
                     var today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (inputDate > today) {
                         isValid = false;
-                        errorMsg += "Search Date of Birth không được nhập ngày trong tương lai.\n";
+                        errorMsg += "<p>Search Date of Birth không được nhập ngày trong tương lai.</p>";
                         $("#searchDOB").val("");
                     }
                 }
 
-                // Nếu có lỗi thì thông báo và dừng xử lý, không thực hiện filter
                 if (!isValid) {
-                    alert(errorMsg);
+                    $errorDiv.html(errorMsg).show();
                     return false;
                 }
 
-                // Nếu hợp lệ, chuyển các giá trị đã trim sang lowercase để filter
-                searchFullName = searchFullName.toLowerCase();
-                searchEmail = searchEmail.toLowerCase();
-                searchPhone = searchPhone.toLowerCase();
-                searchDOB = searchDOB.toLowerCase();
-
-                var selectedGender = [];
-                if ($("#genderMale").is(":checked")) {
-                    selectedGender.push("male");
-                }
-                if ($("#genderFemale").is(":checked")) {
-                    selectedGender.push("female");
-                }
-
-                var searchRole = $("#searchRole").val().toLowerCase();
-
-                // Thực hiện filter trên bảng
-                $("#contentt tr").filter(function () {
-                    var fullName = $(this).find("td").eq(0).text().toLowerCase();
-                    var email = $(this).find("td").eq(2).text().toLowerCase();
-                    var phone = $(this).find("td").eq(3).text().toLowerCase();
-                    var gender = $(this).find("td").eq(4).text().toLowerCase();
-                    var dob = $(this).find("td").eq(5).text().toLowerCase();
-                    var role = $(this).find("td").eq(6).text().toLowerCase();
-
-                    var genderMatch = selectedGender.length === 0 || selectedGender.indexOf(gender) > -1;
-                    var roleMatch = searchRole === "" || role === searchRole;
-
-                    return fullName.indexOf(searchFullName) > -1 &&
-                            email.indexOf(searchEmail) > -1 &&
-                            phone.indexOf(searchPhone) > -1 &&
-                            dob.indexOf(searchDOB) > -1 &&
-                            genderMatch &&
-                            roleMatch;
-                }).show().end().filter(function () {
-                    var fullName = $(this).find("td").eq(0).text().toLowerCase();
-                    var email = $(this).find("td").eq(2).text().toLowerCase();
-                    var phone = $(this).find("td").eq(3).text().toLowerCase();
-                    var gender = $(this).find("td").eq(4).text().toLowerCase();
-                    var dob = $(this).find("td").eq(5).text().toLowerCase();
-                    var role = $(this).find("td").eq(6).text().toLowerCase();
-
-                    var genderMatch = selectedGender.length === 0 || selectedGender.indexOf(gender) > -1;
-                    var roleMatch = searchRole === "" || role === searchRole;
-
-                    return !(fullName.indexOf(searchFullName) > -1 &&
-                            email.indexOf(searchEmail) > -1 &&
-                            phone.indexOf(searchPhone) > -1 &&
-                            dob.indexOf(searchDOB) > -1 &&
-                            genderMatch &&
-                            roleMatch);
-                }).hide();
+                this.submit();
             });
-
-            // Sự kiện blur để validate ngay khi rời khỏi ô (tùy chọn)
-            $("#searchFullName").on("blur", function () {
-                var valOrig = $(this).val();
-                var val = $.trim(valOrig);
-                if (valOrig.length > 0 && val === "") {
-                    alert("Search Full Name không được nhập toàn dấu cách.");
-                    $(this).val("");
-                }
-            });
-
-            $("#searchEmail").on("blur", function () {
-                var valOrig = $(this).val();
-                var val = $.trim(valOrig);
-                if (valOrig.length > 0 && val === "") {
-                    alert("Search Email không được nhập toàn dấu cách.");
-                    $(this).val("");
-                }
-            });
-
-            $("#searchPhone").on("blur", function () {
-                var valOrig = $(this).val();
-                var val = $.trim(valOrig);
-                if (valOrig.length > 0 && val === "") {
-                    alert("Search Phone không được nhập toàn dấu cách.");
-                    $(this).val("");
-                }
-            });
-
-            $("#searchDOB").on("blur", function () {
-                var val = $.trim($(this).val());
-                if (val !== "") {
-                    var inputDate = new Date(val);
-                    var today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    if (inputDate > today) {
-                        alert("Search Date of Birth không được nhập ngày trong tương lai.");
-                        $(this).val("");
-                    }
-                }
-            });
-
-            $(document).ready(function () {
-                $("#searchRole").change(function () {
-                    if ($(this).val() === "custom") {
-                        $("#customRoleDiv").show();
-                    } else {
-                        $("#customRoleDiv").hide();
-                    }
-                });
-            });
-
-            document.getElementById("form").addEventListener("submit", function (event) {
-                let name = document.querySelector("input[name='name']").value.trim();
-                let phone = document.querySelector("input[name='phone']").value.trim();
-
-                let nameRegex = /^[A-Za-zÀ-Ỹà-ỹ]+(?: [A-Za-zÀ-Ỹà-ỹ]+)*$/;
-                let phoneRegex = /^[0-9]{10}$/;
-
-                // Validate Full Name
-                if (!name || !nameRegex.test(name)) {
-                    alert("Full Name không hợp lệ! Chỉ chứa chữ cái, mỗi từ cách nhau một dấu cách.");
-                    event.preventDefault();
-                    return;
-                }
-
-                // Validate Phone
-                if (!phone || !phoneRegex.test(phone)) {
-                    alert("Số điện thoại không hợp lệ! Nhập đúng 10 chữ số, không chứa ký tự đặc biệt.");
-                    event.preventDefault();
-                    return;
-                }
-            });
-
-            document.getElementById("form").addEventListener("submit", function (event) {
-                let name = document.querySelector("input[name='name']").value.trim();
-                let phone = document.querySelector("input[name='phone']").value.trim();
-
-                let nameRegex = /^[A-Za-zÀ-Ỹà-ỹ]+(?: [A-Za-zÀ-Ỹà-ỹ]+)*$/;
-                let phoneRegex = /^0[0-9]{9}$/; // Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số.
-
-                // Validate Full Name
-                if (!name || !nameRegex.test(name)) {
-                    alert("Full Name không hợp lệ! Chỉ chứa chữ cái, mỗi từ cách nhau một dấu cách.");
-                    event.preventDefault();
-                    return;
-                }
-
-                // Validate Phone
-                if (!phone || !phoneRegex.test(phone)) {
-                    alert("Số điện thoại không hợp lệ! Phải bắt đầu bằng số 0, gồm đúng 10 chữ số và không chứa ký tự đặc biệt.");
-                    event.preventDefault();
-                    return;
-                }
-            });
-
 
         </script>
-
 
 
 

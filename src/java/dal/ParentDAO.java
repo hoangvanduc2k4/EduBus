@@ -11,6 +11,30 @@ import java.util.ArrayList;
  */
 public class ParentDAO extends DBContext {
 
+    public List<Parent> getParentByAccId(String id) {
+        List<Parent> list = new ArrayList<>();
+        String sql = "select * from Parent where AccountID = " + id;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Parent o = new Parent(rs.getInt(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getDate(6),
+                        rs.getString(7),
+                        rs.getString(8),
+                        rs.getInt(9));
+                list.add(o);
+            }
+        } catch (SQLException ex) {
+        }
+        return list;
+    }
+
     public void insert(Parent parent) {
         String sql = "INSERT INTO [dbo].[Parent]\n"
                 + "           ([Fullname]\n"
@@ -82,17 +106,15 @@ public class ParentDAO extends DBContext {
             String gender, String role, int accountId,
             int page, int pageSize) {
         List<Parent> list = new ArrayList<>();
-        // Bắt đầu câu truy vấn với điều kiện luôn đúng (1=1) để dễ dàng thêm các điều kiện sau
         StringBuilder sql = new StringBuilder("SELECT * FROM Parent WHERE 1=1");
 
-        // Danh sách lưu các tham số để set vào PreparedStatement
         List<Object> params = new ArrayList<>();
 
-        // Luôn lọc theo accountId
+        // Lọc theo accountId
         sql.append(" AND AccountID = ?");
         params.add(accountId);
 
-        // Thêm điều kiện tìm kiếm nếu giá trị được truyền vào không rỗng/null
+        // Điều kiện tìm kiếm
         if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND Fullname LIKE ?");
             params.add("%" + name + "%");
@@ -118,17 +140,16 @@ public class ParentDAO extends DBContext {
             params.add(role);
         }
 
-        // Sắp xếp theo ParentID (có thể thay đổi theo nhu cầu)
+        // Sắp xếp theo ParentID
         sql.append(" ORDER BY ParentID");
 
-        // Thêm phân trang: OFFSET và FETCH (SQL Server 2012+)
+        // Thêm phân trang
         sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         int offset = (page - 1) * pageSize;
         params.add(offset);
         params.add(pageSize);
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            // Gán các tham số vào PreparedStatement
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -157,18 +178,15 @@ public class ParentDAO extends DBContext {
     public int countParents(String name, String email, String phone, Date dateOfBirth,
             String gender, String role, int accountId) {
         int total = 0;
-
-        // Xây dựng câu truy vấn đếm số lượng
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM Parent WHERE 1=1");
 
-        // Danh sách tham số truy vấn
         List<Object> params = new ArrayList<>();
 
-        // Luôn lọc theo accountId
+        // Lọc theo accountId
         sql.append(" AND AccountID = ?");
         params.add(accountId);
 
-        // Các điều kiện giống searchParents
+        // Điều kiện giống searchParents
         if (name != null && !name.trim().isEmpty()) {
             sql.append(" AND Fullname LIKE ?");
             params.add("%" + name + "%");
@@ -194,7 +212,6 @@ public class ParentDAO extends DBContext {
             params.add(role);
         }
 
-        // Thực hiện truy vấn
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
@@ -206,7 +223,6 @@ public class ParentDAO extends DBContext {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
         return total;
     }
 
